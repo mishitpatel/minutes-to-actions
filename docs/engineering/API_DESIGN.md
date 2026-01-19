@@ -1,6 +1,6 @@
 # API Design Guidelines
 
-> **Last Updated:** YYYY-MM-DD
+> **Last Updated:** 2026-01-19
 > **Base URL:** `https://api.example.com/v1`
 > **API Style:** RESTful JSON
 

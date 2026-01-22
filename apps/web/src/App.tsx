@@ -3,6 +3,7 @@ import { LoginPage } from './pages/LoginPage';
 import { MeetingNotesPage } from './pages/MeetingNotesPage';
 import { NewNotePage } from './pages/NewNotePage';
 import { NoteDetailPage } from './pages/NoteDetailPage';
+import { BoardPage } from './pages/BoardPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
 function App() {
@@ -30,6 +31,14 @@ function App() {
         element={
           <ProtectedRoute>
             <NoteDetailPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/board"
+        element={
+          <ProtectedRoute>
+            <BoardPage />
           </ProtectedRoute>
         }
       />

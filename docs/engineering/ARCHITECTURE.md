@@ -1,243 +1,358 @@
-# Engineering Architecture
+# Architecture — Minutes to Actions
 
-> **Last Updated:** YYYY-MM-DD
-> **Status:** Draft | Approved
-> **Tech Lead:** [Name]
+> **Last Updated:** 2026-01-19
+> **Phase:** 1 (MVP)
+> **Status:** Planning
+>
+> For reusable architecture patterns, see `docs/guidelines/architecture_guidelines.md`.
 
 ## System Overview
 
+Minutes to Actions is a productivity tool that extracts action-items from meeting notes and manages them on a Kanban board.
+
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│                            CLIENT LAYER                             │
-├─────────────────────────────────────────────────────────────────────┤
-│  ┌──────────────────┐    ┌──────────────────┐                       │
-│  │   Web App        │    │   Mobile App     │                       │
-│  │   (React SPA)    │    │   (React Native) │                       │
-│  └────────┬─────────┘    └────────┬─────────┘                       │
-│           │                       │                                 │
-└───────────┼───────────────────────┼─────────────────────────────────┘
-            │                       │
-            ▼                       ▼
+│                         CLIENT (Browser)                            │
+│  ┌───────────────────────────────────────────────────────────────┐  │
+│  │                    React SPA (Vite)                           │  │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐   │  │
+│  │  │ Meeting     │  │ Action      │  │ Share Board         │   │  │
+│  │  │ Notes Inbox │  │ Board       │  │ (Public View)       │   │  │
+│  │  └─────────────┘  └─────────────┘  └─────────────────────┘   │  │
+│  └───────────────────────────────────────────────────────────────┘  │
+└───────────────────────────────────┬─────────────────────────────────┘
+                                    │ HTTPS
+                                    ▼
 ┌─────────────────────────────────────────────────────────────────────┐
-│                          API GATEWAY / CDN                          │
-│                    (CloudFlare / AWS CloudFront)                    │
+│                         API SERVER (Node.js)                        │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │                        Fastify                               │   │
+│  │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌────────────┐   │   │
+│  │  │ Auth     │  │ Meeting  │  │ Action   │  │ Board      │   │   │
+│  │  │ Module   │  │ Notes    │  │ Items    │  │ Sharing    │   │   │
+│  │  │          │  │ Module   │  │ Module   │  │ Module     │   │   │
+│  │  └──────────┘  └──────────┘  └──────────┘  └────────────┘   │   │
+│  └─────────────────────────────────────────────────────────────┘   │
+│                                    │                                │
+│  ┌─────────────────────────────────┼───────────────────────────┐   │
+│  │              External Services  │                            │   │
+│  │  ┌──────────────────┐    ┌─────┴────────┐                   │   │
+│  │  │ Google OAuth     │    │ Claude API   │                   │   │
+│  │  │ (Authentication) │    │ (Extraction) │                   │   │
+│  │  └──────────────────┘    └──────────────┘                   │   │
+│  └─────────────────────────────────────────────────────────────┘   │
 └───────────────────────────────────┬─────────────────────────────────┘
                                     │
                                     ▼
 ┌─────────────────────────────────────────────────────────────────────┐
-│                          BACKEND SERVICES                           │
-├─────────────────────────────────────────────────────────────────────┤
-│  ┌──────────────────┐    ┌──────────────────┐    ┌─────────────┐   │
-│  │   API Server     │    │   Auth Service   │    │   Workers   │   │
-│  │   (Node.js)      │    │   (JWT/OAuth)    │    │   (Jobs)    │   │
-│  └────────┬─────────┘    └────────┬─────────┘    └──────┬──────┘   │
-│           │                       │                      │          │
-└───────────┼───────────────────────┼──────────────────────┼──────────┘
-            │                       │                      │
-            ▼                       ▼                      ▼
-┌─────────────────────────────────────────────────────────────────────┐
 │                           DATA LAYER                                │
-├─────────────────────────────────────────────────────────────────────┤
-│  ┌──────────────────┐    ┌──────────────────┐    ┌─────────────┐   │
-│  │   PostgreSQL     │    │   Redis          │    │   S3/Blob   │   │
-│  │   (Primary DB)   │    │   (Cache/Queue)  │    │   (Files)   │   │
-│  └──────────────────┘    └──────────────────┘    └─────────────┘   │
+│  ┌─────────────────────────────────────────────────────────────┐   │
+│  │                      PostgreSQL                              │   │
+│  │  ┌────────┐  ┌───────────────┐  ┌──────────────┐            │   │
+│  │  │ users  │  │ meeting_notes │  │ action_items │            │   │
+│  │  └────────┘  └───────────────┘  └──────────────┘            │   │
+│  │  ┌────────────┐  ┌──────────┐                               │   │
+│  │  │ board_     │  │ sessions │                               │   │
+│  │  │ shares     │  │          │                               │   │
+│  │  └────────────┘  └──────────┘                               │   │
+│  └─────────────────────────────────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-## Tech Stack
+---
+
+## Tech Stack (This Project)
 
 ### Frontend
 
-| Technology | Purpose | Version |
-|------------|---------|---------|
-| React | UI Framework | 18.x |
-| TypeScript | Type Safety | 5.x |
-| Vite | Build Tool | 5.x |
-| TanStack Query | Server State | 5.x |
-| Zustand | Client State | 4.x |
-| React Router | Routing | 6.x |
-| Tailwind CSS | Styling | 3.x |
-| React Hook Form | Forms | 7.x |
-| Zod | Validation | 3.x |
+| Technology | Purpose |
+|------------|---------|
+| React 18 | UI Framework |
+| TypeScript | Type Safety |
+| Vite | Build Tool |
+| TanStack Query | Server State & Caching |
+| React Router | Client-side Routing |
+| Tailwind CSS | Styling |
+| dnd-kit | Drag and Drop (Kanban) |
+| Zod | Form Validation |
 
 ### Backend
 
-| Technology | Purpose | Version |
-|------------|---------|---------|
-| Node.js | Runtime | 20.x LTS |
-| TypeScript | Type Safety | 5.x |
-| Express/Fastify | Web Framework | - |
-| Prisma | ORM | 5.x |
-| Zod | Validation | 3.x |
-| JWT | Authentication | - |
-| BullMQ | Job Queue | 5.x |
+| Technology     | Purpose                |
+| -------------- | ---------------------- |
+| Node.js 20 LTS | Runtime                |
+| TypeScript     | Type Safety            |
+| Fastify        | Web Framework          |
+| Prisma         | Database ORM           |
+| Zod            | Request Validation     |
+| Anthropic SDK  | Claude API Integration |
 
 ### Database
 
 | Technology | Purpose |
 |------------|---------|
-| PostgreSQL | Primary database |
-| Redis | Caching, sessions, queue |
+| PostgreSQL | Primary Database |
 
-### DevOps
+### External Services
 
-| Technology | Purpose |
-|------------|---------|
-| Docker | Containerization |
-| GitHub Actions | CI/CD |
-| Vitest | Testing |
-| ESLint + Prettier | Code quality |
+| Service | Purpose |
+|---------|---------|
+| Google OAuth | User Authentication |
+| Claude API (Anthropic) | Action-item Extraction |
+
+---
 
 ## Project Structure
 
 ```
-project-root/
+minutes-to-actions/
 ├── apps/
-│   ├── web/                      # Frontend application
+│   ├── web/                          # React Frontend
 │   │   ├── src/
-│   │   │   ├── components/       # Reusable UI components
-│   │   │   │   ├── ui/           # Base components (Button, Input)
-│   │   │   │   └── features/     # Feature-specific components
-│   │   │   ├── pages/            # Route pages/views
-│   │   │   ├── hooks/            # Custom React hooks
-│   │   │   ├── services/         # API client functions
-│   │   │   ├── stores/           # Zustand stores
-│   │   │   ├── utils/            # Utility functions
-│   │   │   ├── types/            # Frontend-specific types
+│   │   │   ├── components/
+│   │   │   │   ├── ui/               # Button, Input, Modal, etc.
+│   │   │   │   ├── meeting-notes/    # MeetingNoteCard, MeetingNoteEditor
+│   │   │   │   ├── action-items/     # ActionItemCard, KanbanColumn
+│   │   │   │   ├── board/            # ActionBoard, PublicBoard
+│   │   │   │   └── layout/           # AppShell, Sidebar, Header
+│   │   │   ├── pages/
+│   │   │   │   ├── MeetingNotesInbox.tsx
+│   │   │   │   ├── MeetingNoteDetail.tsx
+│   │   │   │   ├── ActionBoard.tsx
+│   │   │   │   ├── ShareBoard.tsx
+│   │   │   │   ├── PublicBoard.tsx   # /shared/:token
+│   │   │   │   └── Login.tsx
+│   │   │   ├── hooks/
+│   │   │   ├── services/             # API client functions
+│   │   │   ├── stores/               # Auth state, UI state
 │   │   │   └── App.tsx
-│   │   ├── public/
 │   │   └── package.json
 │   │
-│   └── api/                      # Backend application
+│   └── api/                          # Node.js Backend
 │       ├── src/
-│       │   ├── modules/          # Feature modules
-│       │   │   └── [feature]/
-│       │   │       ├── [feature].schemas.ts
-│       │   │       ├── [feature].handler.ts
-│       │   │       └── [feature].routes.ts
-│       │   ├── middleware/       # Express middleware
-│       │   ├── utils/            # Utility functions
-│       │   ├── config/           # Configuration
+│       │   ├── modules/
+│       │   │   ├── auth/             # Google OAuth, sessions
+│       │   │   ├── meeting-notes/    # CRUD for notes
+│       │   │   ├── action-items/     # CRUD + extraction
+│       │   │   └── board-share/      # Public sharing
+│       │   ├── middleware/
+│       │   │   ├── auth.ts           # JWT/session validation
+│       │   │   ├── validation.ts     # Zod validation
+│       │   │   └── error-handler.ts
+│       │   ├── lib/
+│       │   │   ├── db.ts             # Database connection
+│       │   │   └── claude.ts         # Claude API client
 │       │   └── app.ts
-│       ├── prisma/
-│       │   └── schema.prisma
+│       ├── migrations/               # Database migrations
 │       └── package.json
 │
 ├── packages/
-│   └── shared/                   # Shared code
-│       ├── src/
-│       │   ├── types/            # Shared TypeScript types
-│       │   ├── constants/        # Shared constants
-│       │   ├── utils/            # Shared utilities
-│       │   └── validators/       # Shared Zod schemas
-│       └── package.json
+│   └── shared/                       # Shared Types
+│       └── src/
+│           ├── types/
+│           │   ├── user.ts
+│           │   ├── meeting-note.ts
+│           │   ├── action-item.ts
+│           │   └── board-share.ts
+│           └── validators/           # Shared Zod schemas
 │
-├── docs/                         # Documentation
-├── .github/                      # GitHub Actions
-├── docker-compose.yml
-├── pnpm-workspace.yaml
-└── package.json
+├── docs/                             # Documentation
+├── docker-compose.yml                # Local PostgreSQL
+└── pnpm-workspace.yaml
 ```
 
-## Key Architecture Decisions
+---
 
-### ADR-001: Monorepo with pnpm Workspaces
-- **Decision:** Use monorepo structure
-- **Rationale:** Shared types, atomic changes, simplified dependency management
-- **Consequences:** Requires workspace-aware tooling
+## Feature Modules
 
-### ADR-002: API-First Development
-- **Decision:** Design OpenAPI specs before implementation
-- **Rationale:** Contract-first ensures frontend/backend alignment
-- **Consequences:** Requires upfront API design effort
+### Auth Module
+- Google OAuth flow (redirect, callback)
+- Session creation and validation
+- Session token management
+- Sign out
 
-### ADR-003: Feature-Based Module Structure
-- **Decision:** Organize backend by feature, not layer
-- **Rationale:** Better colocation, easier to understand domain
-- **Consequences:** May have some code duplication
+### Meeting Notes Module
+- Create meeting note (title optional, body required)
+- List notes (paginated, sorted by date)
+- Get note detail with linked action-items
+- Update note
+- Delete note
+
+### Action Items Module
+- List action-items by status (grouped for Kanban)
+- Create action-item (manual)
+- Create action-items (bulk, from extraction)
+- Update action-item
+- Update status (for drag-drop)
+- Update position (for reordering)
+- Delete action-item
+- **Extract action-items** (Claude API integration)
+
+### Board Share Module
+- Get share config
+- Enable sharing (generate token)
+- Disable sharing
+- Regenerate token
+- Get public board data (by token)
+
+---
 
 ## Data Flow
 
-### Request Lifecycle
+### Authentication Flow
 
 ```
-1. Client Request
-   ↓
-2. API Gateway (rate limiting, CORS)
-   ↓
-3. Authentication Middleware (JWT validation)
-   ↓
-4. Request Validation (Zod schemas)
-   ↓
-5. Routes (HTTP wiring with catchAsync)
-   ↓
-6. Handler (business logic + data access)
-   ↓
-7. Database (via Prisma)
-   ↓
-8. Response serialization
-   ↓
-9. Client Response
+User clicks "Sign in with Google"
+         │
+         ▼
+┌─────────────────────────┐
+│ Redirect to Google OAuth │
+└───────────┬─────────────┘
+            │
+            ▼
+┌─────────────────────────┐
+│ Google authenticates    │
+│ user and redirects back │
+└───────────┬─────────────┘
+            │
+            ▼
+┌─────────────────────────┐
+│ API: /auth/google/callback │
+│ - Validate OAuth code    │
+│ - Create/update user     │
+│ - Create session         │
+│ - Set httpOnly cookie    │
+└───────────┬─────────────┘
+            │
+            ▼
+┌─────────────────────────┐
+│ Redirect to app         │
+│ (Meeting Notes Inbox)   │
+└─────────────────────────┘
 ```
 
-### State Management (Frontend)
+### Extraction Flow
 
 ```
-Server State (TanStack Query)     Client State (Zustand)
-├── API responses                 ├── UI state (modals, sidebars)
-├── Caching                       ├── Form drafts
-├── Optimistic updates            └── User preferences
-└── Background refetching
+User clicks "Extract action-items"
+         │
+         ▼
+┌─────────────────────────┐
+│ API: POST /meeting-notes/:id/extract │
+└───────────┬─────────────┘
+            │
+            ▼
+┌─────────────────────────┐
+│ Fetch meeting note body │
+└───────────┬─────────────┘
+            │
+            ▼
+┌─────────────────────────┐
+│ Call Claude API with    │
+│ extraction prompt       │
+└───────────┬─────────────┘
+            │
+            ▼
+┌─────────────────────────┐
+│ Parse structured output │
+│ (title, priority, date) │
+└───────────┬─────────────┘
+            │
+            ▼
+┌─────────────────────────┐
+│ Return extracted items  │
+│ (not yet saved)         │
+└───────────┬─────────────┘
+            │
+            ▼
+┌─────────────────────────┐
+│ User reviews/edits      │
+│ in preview modal        │
+└───────────┬─────────────┘
+            │
+            ▼
+┌─────────────────────────┐
+│ User clicks "Save"      │
+│ API: POST /action-items/bulk │
+└───────────┬─────────────┘
+            │
+            ▼
+┌─────────────────────────┐
+│ Action items saved to   │
+│ database with note link │
+└─────────────────────────┘
 ```
+
+---
+
+## Server Lifecycle
+
+### Startup
+
+1. Load environment configuration
+2. Initialize database connection
+3. Register plugins and routes
+4. Start HTTP server
+
+### Shutdown (SIGTERM/SIGINT)
+
+1. Stop accepting new connections
+2. Wait for active requests to complete
+3. Close database connections (via onClose hooks)
+4. Exit process
+
+---
 
 ## Security Considerations
 
-### Authentication Flow
-1. User submits credentials
-2. Server validates and issues JWT (access + refresh tokens)
-3. Access token stored in memory (not localStorage)
-4. Refresh token stored in httpOnly cookie
-5. Token refresh handled automatically
+### Authentication
+- Google OAuth only (no password storage)
+- Session tokens hashed before storage
+- httpOnly, secure, sameSite cookies
+- Session expiration and cleanup
 
-### Security Checklist
-- [ ] HTTPS everywhere
-- [ ] CORS properly configured
-- [ ] Rate limiting enabled
-- [ ] Input validation on all endpoints
-- [ ] SQL injection prevention (Prisma)
-- [ ] XSS prevention (React escaping + CSP)
-- [ ] CSRF protection
-- [ ] Secrets in environment variables
+### Authorization
+- All API endpoints require authentication (except public board)
+- Users can only access their own data
+- Public board: read-only, no source note links
 
-## Performance Targets
+### Data Protection
+- Input validation on all endpoints (Zod)
+- SQL injection prevention (ORM)
+- XSS prevention (React escaping)
 
-| Metric | Target |
-|--------|--------|
-| API response time (p95) | < 200ms |
-| Time to First Byte (TTFB) | < 100ms |
-| Largest Contentful Paint (LCP) | < 2.5s |
-| First Input Delay (FID) | < 100ms |
-| Database query time (p95) | < 50ms |
+---
 
-## Scalability Considerations
+## Environment Variables
 
-### Horizontal Scaling
-- Stateless API servers behind load balancer
-- Database read replicas for read-heavy workloads
-- Redis for session/cache distribution
+```bash
+# Database
+DATABASE_URL=postgresql://user:pass@localhost:5432/minutes_to_actions
 
-### Caching Strategy
+# Google OAuth
+GOOGLE_CLIENT_ID=xxx
+GOOGLE_CLIENT_SECRET=xxx
+GOOGLE_CALLBACK_URL=http://localhost:3000/auth/google/callback
+
+# Claude API
+ANTHROPIC_API_KEY=xxx
+
+# Session
+SESSION_SECRET=xxx
+
+# App
+API_URL=http://localhost:3001      # Base URL for API (used in Swagger/OpenAPI docs)
+WEB_URL=http://localhost:3000      # Frontend URL for CORS and redirects
+NODE_ENV=development
 ```
-Browser Cache → CDN → Redis → Database
-     ↑            ↑       ↑
-  Static       API      Query
-  Assets    Responses  Results
-```
+
+---
 
 ## Related Documents
 
-- API Design: `docs/engineering/API_DESIGN.md`
-- Database Schema: `docs/engineering/DATABASE.md`
-- Frontend Guidelines: `docs/guidelines/FRONTEND.md`
-- Backend Guidelines: `docs/guidelines/BACKEND.md`
+- Product Spec: `docs/product/product-spec.md`
+- User Stories: `docs/product/user-stories-phase1.md`
+- Database Schema: `docs/engineering/database-schema.md`
+- API Spec: `docs/engineering/api-spec.md`
+- Project Plan: `docs/project/project-plan.md`
+- Architecture Patterns: `docs/guidelines/architecture_guidelines.md`

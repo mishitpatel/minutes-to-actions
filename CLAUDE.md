@@ -1,94 +1,136 @@
-# Project: [PROJECT_NAME]
+# Minutes to Actions
 
-> **Spec-Driven Development with Progressive Disclosure**
-> Keep this file concise (~70 lines). Detailed specs live in `docs/`.
+> Paste meeting notes, extract action-items, manage them on a Kanban board, and share a read-only board link.
+
+## Core Concepts
+
+| Term | Definition |
+|------|------------|
+| Meeting Notes | Raw text pasted by user containing discussion points and decisions |
+| Action Items | Extracted tasks with assignee, due date, and status |
+| Kanban Board | Visual board with columns: To Do, In Progress, Done |
+| Share Links | Read-only URLs for external stakeholders to view boards |
+
+## Project Structure
+
+```
+apps/
+├── web/                  # React frontend (Vite + TypeScript)
+└── api/                  # Node.js backend (Fastify)
+packages/
+└── shared/               # Shared types, utilities, constants
+docs/
+├── project/              # Status, plan, changelog
+├── devops/               # Commands, CI/CD, troubleshooting
+├── product/              # Specs, user stories
+├── engineering/          # Architecture, API, database
+└── guidelines/           # Coding standards
+```
 
 ## Quick Start
 
 ```bash
-# Install dependencies
-pnpm install
-
-# Start development (both frontend + backend)
-pnpm dev
-
-# Run tests
-pnpm test
-
-# Build for production
-pnpm build
+pnpm install          # Install dependencies
+pnpm dev              # Start frontend (5173) + backend (3000)
+pnpm test             # Run tests
+pnpm build            # Build for production
+pnpm lint             # Check code quality
 ```
 
-## Project Map
+### First Time Setup
 
+```bash
+docker-compose up -d          # Start PostgreSQL + Redis
+cp .env.example .env          # Configure environment (add Google OAuth creds)
+pnpm db:migrate               # Run database migrations
+pnpm dev                      # Start development
 ```
-├── apps/
-│   ├── web/              # React frontend (Vite + TypeScript)
-│   └── api/              # Node.js backend (Express/Fastify)
-├── packages/
-│   └── shared/           # Shared types, utilities, constants
-├── docs/                 # 📚 Detailed documentation (READ BEFORE CODING)
-│   ├── product/          # PRDs, specs, user stories
-│   ├── engineering/      # Architecture, API design, database
-│   ├── guidelines/       # Coding standards, UI/UX, testing
-│   └── project/          # Milestones, workflows, decisions
-└── .claude/              # Claude Code configuration
-```
+
+See `docs/devops/commands.md` for full command reference.
+
+## Key Constraints
+
+- **No file uploads** in Phase 1 (paste text only)
+- **Monorepo** with pnpm workspaces
+- **PostgreSQL** primary, Redis for caching
+- **Conventional commits**: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`
 
 ## Before You Code
 
-**Read the relevant docs first** — Claude should read these before implementing:
+```
+What are you building?
+├── New feature     → docs/product/product-spec.md
+├── API endpoint    → docs/engineering/api-spec.md
+├── Database change → docs/engineering/database-schema.md
+└── Bug fix         → Check relevant guideline first
 
-| Task Type | Read First |
-|-----------|------------|
-| New feature | `docs/product/PRODUCT_OVERVIEW.md` → relevant spec |
-| API work | `docs/engineering/API_DESIGN.md` |
-| Database changes | `docs/engineering/DATABASE.md` |
-| Frontend UI | `docs/guidelines/FRONTEND.md` + `docs/guidelines/UI_UX.md` |
-| Backend logic | `docs/guidelines/BACKEND.md` |
-| Security | `docs/guidelines/SECURITY.md` |
-| Writing tests | `docs/guidelines/TESTING.md` |
-| Git workflow | `docs/project/GITHUB_WORKFLOW.md` |
-| Architecture decisions | `docs/engineering/decisions/` |
-
-## Key Conventions
-
-- **API-first**: Design OpenAPI spec before implementing
-- **Types-first**: Define shared types in `packages/shared` before coding
-- **Test-driven**: Write tests alongside features
-- **Conventional commits**: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`
-
-## Tech Stack Summary
-
-| Layer | Technology |
-|-------|------------|
-| Frontend | React 18, TypeScript, Vite, TanStack Query, Tailwind CSS |
-| Backend | Node.js, TypeScript, Express/Fastify, Zod |
-| Database | PostgreSQL (primary), Redis (cache) |
-| Testing | Vitest, React Testing Library, Supertest |
-| CI/CD | GitHub Actions |
-
-## Current Focus
-
-> Update this section for each milestone
-
-- Current milestone: See `docs/project/milestones/`
-- Active stories: Check `docs/product/stories/`
-
-## Quick Commands
-
-```bash
-pnpm dev          # Start development
-pnpm test         # Run tests
-pnpm build        # Build for production
-pnpm lint         # Check code quality
+Which layer?
+├── Frontend → docs/guidelines/frontend_guidelines.md
+├── Backend  → docs/guidelines/backend_guidelines.md
+└── Both     → docs/guidelines/api_guidelines.md
 ```
 
-See `docs/project/COMMANDS.md` for complete reference.
+### Development Patterns
 
-## Constraints
+| Pattern | Practice |
+|---------|----------|
+| API-first | Design OpenAPI spec before implementing |
+| Schema-first | Define Zod schemas in modules, types are inferred |
+| Test-driven | Write tests alongside features |
 
-- No breaking API changes without versioning
-- All PRs require tests for new functionality
-- Maximum response time: 200ms (p95) for API endpoints
-- See `docs/project/CONSTRAINTS.md` for full list
+### Backend API Patterns
+
+**IMPORTANT:** Read `docs/guidelines/backend_guidelines.md` before creating API endpoints.
+
+**Creating a New Module:**
+1. Create folder: `src/modules/[feature]/`
+2. Create files (3-file pattern):
+   - `[feature].schemas.ts` — Zod schemas + inferred types
+   - `[feature].handler.ts` — Business logic (pure functions, no classes)
+   - `[feature].routes.ts` — HTTP wiring with `withTypeProvider<ZodTypeProvider>()`
+   - `[feature].test.ts` — Co-located tests
+3. Import common schemas from `@/schemas/common`
+4. Use custom errors from `@/utils/errors`
+5. Define Zod schemas for all request/response types
+6. Include full `schema` block: `{ description, tags, body/params/querystring, response }`
+7. Add response schemas for ALL status codes (201, 400, 401, 404, 422)
+8. Register routes in `app.ts` with `/api` prefix
+9. Verify endpoint appears at http://localhost:3000/docs
+
+### Error Handling
+
+Use custom errors in handlers (not routes):
+```typescript
+import { NotFoundError, ConflictError } from '@/utils/errors';
+
+// In handler - throw errors
+if (!resource) throw new NotFoundError('Resource not found');
+
+// Global error handler in app.ts converts to HTTP response
+```
+
+**Available errors**: `NotFoundError`, `UnauthorizedError`, `BadRequestError`, `ForbiddenError`, `ConflictError`, `ValidationError`
+
+## Documentation Map
+
+| Category    | Key Files                                                              |
+| ----------- | ---------------------------------------------------------------------- |
+| Project     | `STATUS.md`, `project-plan.md`, `changelog.md`                         |
+| DevOps      | `commands.md`, `github-workflow.md`, `troubleshooting.md`              |
+| Product     | `product-spec.md`, `user-stories-phase1.md`                            |
+| Engineering | `api-spec.md`, `database-schema.md`, `architecture.md`                 |
+| Guidelines  | `frontend_guidelines.md`, `backend_guidelines.md`, `api_guidelines.md` |
+|             |                                                                        |
+
+All docs in `docs/` directory.
+
+---
+
+## Session Continuity
+
+📍 **Start every session by reading `docs/project/STATUS.md`**
+
+This file contains:
+- Current task and position in project plan
+- Any blockers
+- Session workflow instructions

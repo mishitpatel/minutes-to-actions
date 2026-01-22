@@ -4,11 +4,10 @@ Defines *how* the system is built.
 
 | Document                             | Purpose                                 |
 | ------------------------------------ | --------------------------------------- |
-| [ARCHITECTURE.md](./ARCHITECTURE.md) | System design, tech stack, data flow    |
-| [API_DESIGN.md](./API_DESIGN.md)     | REST conventions, endpoints, validation |
-| [DATABASE.md](./DATABASE.md)         | Schema patterns, migrations, queries    |
+| [architecture.md](./architecture.md) | System design, tech stack, data flow    |
+| [api-spec.md](./api-spec.md)         | REST conventions, endpoints, validation |
+| [database-schema.md](./database-schema.md)         | Schema patterns, migrations, queries    |
 | [decisions/](./decisions/)           | Architecture Decision Records           |
-|                                      |                                         |
 
 ## Key Patterns
 - API-first: Design OpenAPI spec before implementing

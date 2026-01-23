@@ -90,4 +90,16 @@ export const actionItemsService = {
   async delete(id: string): Promise<void> {
     await api.delete(`/action-items/${id}`);
   },
+
+  async updatePosition(id: string, position: number): Promise<ActionItem> {
+    const response = await api.patch<CreatedResponse>(`/action-items/${id}/position`, { position });
+    return response.data;
+  },
+
+  async moveItem(id: string, status: Status, position: number): Promise<ActionItem> {
+    // First update status, then position
+    await api.patch<CreatedResponse>(`/action-items/${id}/status`, { status });
+    const response = await api.patch<CreatedResponse>(`/action-items/${id}/position`, { position });
+    return response.data;
+  },
 };

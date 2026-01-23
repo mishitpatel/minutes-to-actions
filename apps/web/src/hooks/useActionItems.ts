@@ -4,6 +4,7 @@ import {
   type Status,
   type CreateActionItemData,
   type UpdateActionItemData,
+  type GroupedActionItems,
 } from '../services/action-items.service';
 
 export const ACTION_ITEMS_QUERY_KEY = ['action-items'];
@@ -78,5 +79,66 @@ export function useActionItem(id: string) {
     queryFn: () => actionItemsService.get(id),
     enabled: !!id,
     staleTime: 1000 * 60, // 1 minute
+  });
+}
+
+interface MoveItemParams {
+  id: string;
+  fromStatus: Status;
+  toStatus: Status;
+  newPosition: number;
+}
+
+export function useMoveActionItem() {
+  const queryClient = useQueryClient();
+  const queryKey = [...ACTION_ITEMS_QUERY_KEY, 'grouped'];
+
+  return useMutation({
+    mutationFn: async ({ id, toStatus, newPosition }: MoveItemParams) => {
+      return actionItemsService.moveItem(id, toStatus, newPosition);
+    },
+    onMutate: async ({ id, fromStatus, toStatus, newPosition }) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey });
+
+      // Snapshot the previous value
+      const previousItems = queryClient.getQueryData<GroupedActionItems>(queryKey);
+
+      // Optimistically update to the new value
+      if (previousItems) {
+        const newItems = { ...previousItems };
+
+        // Find and remove the item from its current column
+        const item = newItems[fromStatus].find((i) => i.id === id);
+        if (item) {
+          newItems[fromStatus] = newItems[fromStatus].filter((i) => i.id !== id);
+
+          // Add item to new column at the correct position
+          const movedItem = { ...item, status: toStatus, position: newPosition };
+          const targetColumn = [...newItems[toStatus]];
+          targetColumn.splice(newPosition, 0, movedItem);
+
+          // Update positions for all items in the target column
+          newItems[toStatus] = targetColumn.map((i, index) => ({
+            ...i,
+            position: index,
+          }));
+
+          queryClient.setQueryData(queryKey, newItems);
+        }
+      }
+
+      return { previousItems };
+    },
+    onError: (_err, _variables, context) => {
+      // Rollback on error
+      if (context?.previousItems) {
+        queryClient.setQueryData(queryKey, context.previousItems);
+      }
+    },
+    onSettled: () => {
+      // Always refetch after error or success
+      queryClient.invalidateQueries({ queryKey: ACTION_ITEMS_QUERY_KEY });
+    },
   });
 }

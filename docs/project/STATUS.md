@@ -1,13 +1,13 @@
 # Project Status
 
-> Last Updated: 2026-01-22
+> Last Updated: 2026-01-23
 > Updated By: Claude Code
 
 ## Current Position
 
 **Phase:** 1 (MVP)
 **Milestone:** M3 - Action Items & Kanban Board
-**Task:** 3.4 - Action Item Card Component
+**Task:** 3.6 - Action Item Detail/Edit Modal
 **Status:** Not Started
 
 → See `project-plan.md` for full task details and subtasks
@@ -21,7 +21,7 @@
 ## Session Context
 
 ### Current Task Reference
-- **Location:** `project-plan.md` → Milestone 3 → Task 3.4
+- **Location:** `project-plan.md` → Milestone 3 → Task 3.6
 - **Files to modify:** `apps/web/src/components/`
 - **Reference docs:** `docs/guidelines/frontend_guidelines.md`, `docs/engineering/api-spec.md`
 
@@ -33,6 +33,29 @@
 | 2026-01-20 | devops/ folder | Separate operational from state docs |
 
 ### Session Log
+**2026-01-23 - Task 3.5 Complete**
+- Installed @dnd-kit/core, @dnd-kit/sortable, @dnd-kit/utilities
+- Created `apps/web/src/components/DraggableActionItemCard.tsx` - Sortable wrapper using useSortable
+- Updated `apps/web/src/components/KanbanColumn.tsx` - Added useDroppable and SortableContext
+- Updated `apps/web/src/pages/BoardPage.tsx` - DndContext with sensors, drag overlay, and handlers
+- Updated `apps/web/src/services/action-items.service.ts` - Added updatePosition and moveItem methods
+- Updated `apps/web/src/hooks/useActionItems.ts` - Added useMoveActionItem with optimistic updates
+- Features: drag cards between columns, visual feedback (blue highlight on drop zones), drag overlay with rotation
+- Optimistic updates with rollback on error
+- Keyboard navigation support (tab, space/enter to pick up, arrows to move)
+- Next: Start Task 3.6 - Action Item Detail/Edit Modal
+
+**2026-01-23 - Task 3.4 Complete**
+- Created `apps/web/src/components/ActionItemCard.tsx` - Full-featured action item card
+- Features: title with strikethrough when done, color-coded priority badge, due date with overdue indicator
+- Source note link (navigates to note, shows "Note deleted" if source deleted)
+- "Mark done" checkbox for quick completion (green checkmark when done)
+- "Move to..." dropdown menu for status changes
+- Overdue items have red border and background highlight
+- Updated `KanbanColumn.tsx` to use new ActionItemCard component
+- Wired up `BoardPage.tsx` with status change handler using `useUpdateActionItemStatus`
+- Next: Start Task 3.5 - Drag and Drop Functionality
+
 **2026-01-22 - Task 6.1 Complete (moved earlier)**
 - Created AppLayout and Sidebar components in `apps/web/src/components/layouts/`
 - Implemented nested routing in App.tsx with AppLayout wrapper

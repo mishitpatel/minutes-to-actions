@@ -5,43 +5,24 @@ import { NewNotePage } from './pages/NewNotePage';
 import { NoteDetailPage } from './pages/NoteDetailPage';
 import { BoardPage } from './pages/BoardPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { AppLayout } from './components/layouts';
 
 function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route
-        path="/notes"
         element={
           <ProtectedRoute>
-            <MeetingNotesPage />
+            <AppLayout />
           </ProtectedRoute>
         }
-      />
-      <Route
-        path="/notes/new"
-        element={
-          <ProtectedRoute>
-            <NewNotePage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/notes/:id"
-        element={
-          <ProtectedRoute>
-            <NoteDetailPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/board"
-        element={
-          <ProtectedRoute>
-            <BoardPage />
-          </ProtectedRoute>
-        }
-      />
+      >
+        <Route path="/notes" element={<MeetingNotesPage />} />
+        <Route path="/notes/new" element={<NewNotePage />} />
+        <Route path="/notes/:id" element={<NoteDetailPage />} />
+        <Route path="/board" element={<BoardPage />} />
+      </Route>
       <Route path="/" element={<Navigate to="/notes" replace />} />
       <Route path="*" element={<Navigate to="/notes" replace />} />
     </Routes>

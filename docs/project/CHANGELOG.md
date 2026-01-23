@@ -31,6 +31,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Action Items database migration (Priority/Status enums, indexes)
 - Action Items API endpoints (list, get, create, bulk create, update, status update, position update, delete)
 - Action Items module with Zod schemas, handler, routes, and 41 tests
+- NoteEditor component for create/edit notes
+- NoteDetailPage with view/edit modes and delete confirmation
+- ConfirmDialog reusable component
+- Kanban Board page with 3 columns (To Do, Doing, Done)
+- KanbanColumn component with item count headers
+- Action Items service (`action-items.service.ts`) for API calls
+- Action Items TanStack Query hooks (`useActionItems.ts`)
+- Route for `/board` Kanban board page
+- AppLayout component for authenticated pages
+- Sidebar navigation component with responsive mobile menu
 
 ### Changed
 - Reformatted CLAUDE.md "First Time Setup" section for consistency

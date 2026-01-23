@@ -70,6 +70,13 @@ Which layer?
 └── Both     → docs/guidelines/api_guidelines.md
 ```
 
+### Git Workflow
+
+**Always branch from main** — see `docs/devops/github-workflow.md#starting-new-work`
+```bash
+git checkout main && git pull origin main && git checkout -b feature/xyz
+```
+
 ### Development Patterns
 
 | Pattern | Practice |

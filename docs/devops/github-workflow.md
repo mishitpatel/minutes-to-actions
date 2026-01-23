@@ -40,6 +40,32 @@ my-branch                   # no prefix
 feature/auth                # too vague
 ```
 
+## Starting New Work
+
+> **Golden Rule:** Always create new branches from an up-to-date `main`.
+
+### Before Every New Task
+```bash
+git checkout main           # Return to main branch
+git pull origin main        # Get latest (includes merged PRs)
+git checkout -b feature/x   # Create new branch from main
+```
+
+### Why This Matters
+Creating a branch from another feature branch causes:
+- Your branch inherits unmerged commits from the other branch
+- PRs show unrelated changes in the diff
+- Merge conflicts when the other branch gets merged first
+- Extra work to cherry-pick and recreate the branch
+
+### Quick Alias (Optional)
+```bash
+# Add to ~/.gitconfig or shell profile
+alias gnew='git checkout main && git pull origin main && git checkout -b'
+
+# Usage: gnew feature/my-new-feature
+```
+
 ## Commit Messages
 
 ### Conventional Commits
@@ -94,13 +120,12 @@ Closes #123
 ## Pull Request Workflow
 
 ### 1. Create Branch
-```bash
-# Ensure main is up to date
-git checkout main
-git pull origin main
 
-# Create feature branch
-git checkout -b feature/user-authentication
+See [Starting New Work](#starting-new-work) above, then:
+
+```bash
+# After creating branch, make changes and push
+git push -u origin feature/user-authentication
 ```
 
 ### 2. Make Changes & Commit

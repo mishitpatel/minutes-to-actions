@@ -42,6 +42,15 @@
 - User section with avatar, name, and logout button
 - Next: Start Task 3.4 - Action Item Card Component
 
+**2026-01-22 - Task 3.3 Complete**
+- Created `apps/web/src/pages/BoardPage.tsx` - Kanban board with 3 columns
+- Created `apps/web/src/components/KanbanColumn.tsx` - Column component with item count
+- Created `apps/web/src/services/action-items.service.ts` - API client for action items
+- Created `apps/web/src/hooks/useActionItems.ts` - TanStack Query hooks
+- Added `/board` route to App.tsx
+- Features: 3-column layout (To Do, Doing, Done), empty state placeholders, "Add action-item" button
+- Next: Start Task 3.4 - Action Item Card Component
+
 **2026-01-21 - Task 3.2 Complete**
 - Created `action-items` module (schemas, handler, routes, tests)
 - 8 API endpoints implemented: list, get, create, bulk create, update, status update, position update, delete

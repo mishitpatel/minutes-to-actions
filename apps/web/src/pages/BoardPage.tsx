@@ -15,6 +15,7 @@ import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { useActionItems, useMoveActionItem, useUpdateActionItemStatus } from '../hooks/useActionItems';
 import { KanbanColumn } from '../components/KanbanColumn';
 import { ActionItemCard } from '../components/ActionItemCard';
+import { ActionItemDetailModal } from '../components/ActionItemDetailModal';
 import type { Status, ActionItem } from '../services/action-items.service';
 
 export function BoardPage() {
@@ -22,6 +23,7 @@ export function BoardPage() {
   const updateStatus = useUpdateActionItemStatus();
   const moveItem = useMoveActionItem();
   const [activeItem, setActiveItem] = useState<ActionItem | null>(null);
+  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -44,8 +46,7 @@ export function BoardPage() {
   };
 
   const handleItemClick = (item: ActionItem) => {
-    // Placeholder for Task 3.6 - detail/edit modal
-    console.log('Item clicked:', item.id);
+    setSelectedItemId(item.id);
   };
 
   const findItemById = (id: string): { item: ActionItem; status: Status } | null => {
@@ -233,6 +234,12 @@ export function BoardPage() {
           </DragOverlay>
         </DndContext>
       )}
+
+      <ActionItemDetailModal
+        itemId={selectedItemId}
+        onClose={() => setSelectedItemId(null)}
+        onDeleted={() => setSelectedItemId(null)}
+      />
     </div>
   );
 }

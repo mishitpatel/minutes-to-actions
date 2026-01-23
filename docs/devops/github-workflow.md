@@ -134,10 +134,16 @@ Brief description of what this PR does.
 - Created login/logout endpoints
 - Added password hashing with bcrypt
 
-## Testing
-- [ ] Unit tests added
-- [ ] Integration tests passing
-- [ ] Manual testing completed
+## Task Checklist (from Task X.X)
+- [x] Implement feature A
+- [x] Implement feature B
+- [ ] Implement feature C (if applicable)
+
+## Test Plan
+- [x] Navigate to `http://localhost:5173/feature`
+- [ ] Verify expected behavior A
+- [ ] Verify expected behavior B
+- [ ] Verify error states are handled correctly
 
 ## Screenshots (if UI changes)
 [Add screenshots or videos]

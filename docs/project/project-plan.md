@@ -295,17 +295,17 @@
 
 ---
 
-### Task 3.3: Kanban Board Layout (Frontend)
+### Task 3.3: Kanban Board Layout (Frontend) ✅
 
 **Description:** Build the main Kanban board with three columns.
 
 **Subtasks:**
-- [ ] Create `/board` route/page
-- [ ] Create board layout with 3 columns: To Do, Doing, Done
-- [ ] Fetch action items from API (grouped by status)
-- [ ] Display column headers with item counts
-- [ ] Show empty state placeholder in empty columns
-- [ ] Add "Add action-item" button
+- [x] Create `/board` route/page
+- [x] Create board layout with 3 columns: To Do, Doing, Done
+- [x] Fetch action items from API (grouped by status)
+- [x] Display column headers with item counts
+- [x] Show empty state placeholder in empty columns
+- [x] Add "Add action-item" button
 
 ---
 

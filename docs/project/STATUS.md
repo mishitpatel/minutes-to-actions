@@ -1,13 +1,13 @@
 # Project Status
 
-> Last Updated: 2026-01-21
+> Last Updated: 2026-01-22
 > Updated By: Claude Code
 
 ## Current Position
 
 **Phase:** 1 (MVP)
 **Milestone:** M3 - Action Items & Kanban Board
-**Task:** 3.3 - Kanban Board Layout (Frontend)
+**Task:** 3.4 - Action Item Card Component
 **Status:** Not Started
 
 → See `project-plan.md` for full task details and subtasks
@@ -21,8 +21,8 @@
 ## Session Context
 
 ### Current Task Reference
-- **Location:** `project-plan.md` → Milestone 3 → Task 3.3
-- **Files to modify:** `apps/web/src/pages/`, `apps/web/src/components/`
+- **Location:** `project-plan.md` → Milestone 3 → Task 3.4
+- **Files to modify:** `apps/web/src/components/`
 - **Reference docs:** `docs/guidelines/frontend_guidelines.md`, `docs/engineering/api-spec.md`
 
 ### Recent Decisions
@@ -33,6 +33,15 @@
 | 2026-01-20 | devops/ folder | Separate operational from state docs |
 
 ### Session Log
+**2026-01-22 - Task 6.1 Complete (moved earlier)**
+- Created AppLayout and Sidebar components in `apps/web/src/components/layouts/`
+- Implemented nested routing in App.tsx with AppLayout wrapper
+- Removed duplicate headers from MeetingNotesPage, NewNotePage, NoteDetailPage, BoardPage
+- Added mobile responsive hamburger menu (Task 6.2 partial)
+- Navigation: Meeting Notes, Action Board, Share Board (placeholder)
+- User section with avatar, name, and logout button
+- Next: Start Task 3.4 - Action Item Card Component
+
 **2026-01-21 - Task 3.2 Complete**
 - Created `action-items` module (schemas, handler, routes, tests)
 - 8 API endpoints implemented: list, get, create, bulk create, update, status update, position update, delete

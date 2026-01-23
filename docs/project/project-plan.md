@@ -1,6 +1,6 @@
 # Project Plan — Minutes to Actions (Phase 1 MVP)
 
-> **Last Updated:** 2026-01-21
+> **Last Updated:** 2026-01-22
 > **Phase:** 1 (MVP)
 > **Total User Stories:** 28
 
@@ -598,17 +598,17 @@
 
 ---
 
-### Task 6.1: Sidebar Navigation Component
+### Task 6.1: Sidebar Navigation Component ✅
 
 **Description:** Build the main sidebar navigation.
 
 **Subtasks:**
-- [ ] Create sidebar component
-- [ ] Add navigation links: Meeting Notes Inbox, Action Board, Share Board
-- [ ] Highlight current/active section
-- [ ] Add user profile section (name, avatar)
-- [ ] Add sign out option
-- [ ] Show on all authenticated pages
+- [x] Create sidebar component
+- [x] Add navigation links: Meeting Notes Inbox, Action Board, Share Board
+- [x] Highlight current/active section
+- [x] Add user profile section (name, avatar)
+- [x] Add sign out option
+- [x] Show on all authenticated pages
 
 ---
 
@@ -618,7 +618,7 @@
 
 **Subtasks:**
 - [ ] Implement responsive breakpoints (desktop, tablet, mobile)
-- [ ] Collapse sidebar to hamburger menu on mobile
+- [x] Collapse sidebar to hamburger menu on mobile
 - [ ] Stack Kanban columns vertically on small screens
 - [ ] Ensure all interactive elements are touch-friendly
 - [ ] Test drag-and-drop on touch devices (or provide dropdown fallback)

@@ -16,6 +16,7 @@ import { useActionItems, useMoveActionItem, useUpdateActionItemStatus } from '..
 import { KanbanColumn } from '../components/KanbanColumn';
 import { ActionItemCard } from '../components/ActionItemCard';
 import { ActionItemDetailModal } from '../components/ActionItemDetailModal';
+import { ActionItemCreateModal } from '../components/ActionItemCreateModal';
 import type { Status, ActionItem } from '../services/action-items.service';
 
 export function BoardPage() {
@@ -24,6 +25,8 @@ export function BoardPage() {
   const moveItem = useMoveActionItem();
   const [activeItem, setActiveItem] = useState<ActionItem | null>(null);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [createDefaultStatus, setCreateDefaultStatus] = useState<Status>('todo');
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -36,9 +39,9 @@ export function BoardPage() {
     })
   );
 
-  const handleAddItem = () => {
-    // Placeholder for Task 3.7 - manual creation modal
-    console.log('Add item clicked');
+  const handleAddItem = (status: Status = 'todo') => {
+    setCreateDefaultStatus(status);
+    setIsCreateModalOpen(true);
   };
 
   const handleStatusChange = (id: string, status: Status) => {
@@ -130,7 +133,7 @@ export function BoardPage() {
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-gray-900">Action Board</h2>
         <button
-          onClick={handleAddItem}
+          onClick={() => handleAddItem()}
           className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
           <svg
@@ -203,7 +206,7 @@ export function BoardPage() {
               title="To Do"
               status="todo"
               items={items.todo}
-              onAddItem={handleAddItem}
+              onAddItem={() => handleAddItem('todo')}
               onStatusChange={handleStatusChange}
               onItemClick={handleItemClick}
             />
@@ -211,6 +214,7 @@ export function BoardPage() {
               title="Doing"
               status="doing"
               items={items.doing}
+              onAddItem={() => handleAddItem('doing')}
               onStatusChange={handleStatusChange}
               onItemClick={handleItemClick}
             />
@@ -218,6 +222,7 @@ export function BoardPage() {
               title="Done"
               status="done"
               items={items.done}
+              onAddItem={() => handleAddItem('done')}
               onStatusChange={handleStatusChange}
               onItemClick={handleItemClick}
             />
@@ -239,6 +244,12 @@ export function BoardPage() {
         itemId={selectedItemId}
         onClose={() => setSelectedItemId(null)}
         onDeleted={() => setSelectedItemId(null)}
+      />
+
+      <ActionItemCreateModal
+        open={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        defaultStatus={createDefaultStatus}
       />
     </div>
   );

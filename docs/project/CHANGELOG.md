@@ -43,6 +43,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Sidebar navigation component with responsive mobile menu
 - ActionItemDetailModal component with view/edit modes and delete confirmation
 - Action item click-to-open integration in BoardPage
+- ActionItemCreateModal component for manual action item creation
+- Drag-and-drop action items between Kanban columns with @dnd-kit
+- DraggableActionItemCard wrapper component
+- Optimistic updates for drag-and-drop with rollback on error
+- Keyboard navigation support for drag-and-drop
 
 ### Changed
 - Reformatted CLAUDE.md "First Time Setup" section for consistency

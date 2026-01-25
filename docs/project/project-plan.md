@@ -355,17 +355,17 @@
 
 ---
 
-### Task 3.7: Manual Action Item Creation
+### Task 3.7: Manual Action Item Creation ✅
 
 **Description:** Allow users to create action items without extraction.
 
 **Subtasks:**
-- [ ] Create "Add action item" modal/form
-- [ ] Fields: title (required), description, priority, due date, status
-- [ ] Default priority to Medium, status to To Do
-- [ ] Call POST endpoint on save
-- [ ] Add new item to appropriate column
-- [ ] Show success feedback
+- [x] Create "Add action item" modal/form
+- [x] Fields: title (required), description, priority, due date, status
+- [x] Default priority to Medium, status to To Do
+- [x] Call POST endpoint on save
+- [x] Add new item to appropriate column
+- [x] Show success feedback
 
 ---
 

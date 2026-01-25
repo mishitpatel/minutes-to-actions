@@ -1,13 +1,13 @@
 # Project Status
 
-> Last Updated: 2026-01-23
+> Last Updated: 2026-01-24
 > Updated By: Claude Code
 
 ## Current Position
 
 **Phase:** 1 (MVP)
 **Milestone:** M3 - Action Items & Kanban Board
-**Task:** 3.7 - Manual Action Item Creation
+**Task:** 3.8 - Source Note Navigation
 **Status:** Not Started
 
 → See `project-plan.md` for full task details and subtasks
@@ -21,9 +21,9 @@
 ## Session Context
 
 ### Current Task Reference
-- **Location:** `project-plan.md` → Milestone 3 → Task 3.7
-- **Files to modify:** `apps/web/src/components/`, `apps/web/src/pages/BoardPage.tsx`
-- **Reference docs:** `docs/guidelines/frontend_guidelines.md`, `docs/engineering/api-spec.md`
+- **Location:** `project-plan.md` → Milestone 3 → Task 3.8
+- **Files to modify:** `apps/web/src/components/ActionItemCard.tsx`
+- **Reference docs:** `docs/guidelines/frontend_guidelines.md`
 
 ### Recent Decisions
 | Date | Decision | Rationale |
@@ -33,6 +33,16 @@
 | 2026-01-20 | devops/ folder | Separate operational from state docs |
 
 ### Session Log
+**2026-01-24 - Task 3.7 Complete**
+- Created `apps/web/src/components/ActionItemCreateModal.tsx` - Modal form for manual action item creation
+- Updated `apps/web/src/pages/BoardPage.tsx` - Added create button and modal integration
+- Features: title (required), description, priority dropdown, due date picker, status dropdown
+- Form validation with react-hook-form, default priority Medium, default status To Do
+- Success toast notification on creation
+- Items automatically appear in appropriate column via React Query invalidation
+- Committed and pushed to `feature/action-item-cards` branch (closes #21)
+- Next: Start Task 3.8 - Source Note Navigation
+
 **2026-01-23 - Task 3.6 Complete**
 - Created `apps/web/src/components/ActionItemDetailModal.tsx`
 - View mode: displays title, priority, status, due date, description, source note, timestamps

@@ -338,20 +338,20 @@
 
 ---
 
-### Task 3.6: Action Item Detail/Edit Modal
+### Task 3.6: Action Item Detail/Edit Modal ✅
 
 **Description:** Create modal for viewing and editing action item details.
 
 **Subtasks:**
-- [ ] Create detail modal/drawer component
-- [ ] Display all fields: title, description, priority, due date, status, source note, dates
-- [ ] Add "Edit" button to enter edit mode
-- [ ] Edit form with all editable fields
-- [ ] Priority dropdown (High/Medium/Low)
-- [ ] Status dropdown (To Do/Doing/Done)
-- [ ] Due date picker
-- [ ] "Save" and "Cancel" buttons
-- [ ] "Delete" button with confirmation
+- [x] Create detail modal/drawer component
+- [x] Display all fields: title, description, priority, due date, status, source note, dates
+- [x] Add "Edit" button to enter edit mode
+- [x] Edit form with all editable fields
+- [x] Priority dropdown (High/Medium/Low)
+- [x] Status dropdown (To Do/Doing/Done)
+- [x] Due date picker
+- [x] "Save" and "Cancel" buttons
+- [x] "Delete" button with confirmation
 
 ---
 

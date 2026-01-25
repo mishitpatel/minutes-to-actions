@@ -7,7 +7,7 @@
 
 **Phase:** 1 (MVP)
 **Milestone:** M3 - Action Items & Kanban Board
-**Task:** 3.6 - Action Item Detail/Edit Modal
+**Task:** 3.7 - Manual Action Item Creation
 **Status:** Not Started
 
 → See `project-plan.md` for full task details and subtasks
@@ -21,8 +21,8 @@
 ## Session Context
 
 ### Current Task Reference
-- **Location:** `project-plan.md` → Milestone 3 → Task 3.6
-- **Files to modify:** `apps/web/src/components/`
+- **Location:** `project-plan.md` → Milestone 3 → Task 3.7
+- **Files to modify:** `apps/web/src/components/`, `apps/web/src/pages/BoardPage.tsx`
 - **Reference docs:** `docs/guidelines/frontend_guidelines.md`, `docs/engineering/api-spec.md`
 
 ### Recent Decisions
@@ -33,6 +33,15 @@
 | 2026-01-20 | devops/ folder | Separate operational from state docs |
 
 ### Session Log
+**2026-01-23 - Task 3.6 Complete**
+- Created `apps/web/src/components/ActionItemDetailModal.tsx`
+- View mode: displays title, priority, status, due date, description, source note, timestamps
+- Edit mode: form with validation (title required), priority/status dropdowns, date picker
+- Delete with confirmation dialog (reuses ConfirmDialog)
+- Integrated with BoardPage via card click handler
+- PR #3 updated to include Task 3.6
+- Next: Start Task 3.7 - Manual Action Item Creation
+
 **2026-01-23 - Task 3.5 Complete**
 - Installed @dnd-kit/core, @dnd-kit/sortable, @dnd-kit/utilities
 - Created `apps/web/src/components/DraggableActionItemCard.tsx` - Sortable wrapper using useSortable

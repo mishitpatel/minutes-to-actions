@@ -70,6 +70,27 @@ Which layer?
 └── Both     → docs/guidelines/api_guidelines.md
 ```
 
+## Task Workflow (GitHub Issues)
+
+When working on a task:
+
+1. **Get the issue**: `gh issue view #XX`
+2. **Find user stories**: Look for "References: US-X.X" in the issue
+3. **Read acceptance criteria**: Open `docs/product/user-stories-phase1.md` and find the user story
+4. **Implement to meet ALL acceptance criteria** - not just the subtasks
+5. **Verify before done**: Check each acceptance criterion is satisfied
+
+### User Story Quick Reference
+
+| Milestone | User Stories |
+|-----------|--------------|
+| M1: Auth | US-1.1, US-1.2, US-1.3 |
+| M2: Meeting Notes | US-2.1 through US-2.5 |
+| M3: Action Board | US-4.1 through US-4.9 |
+| M4: AI Extraction | US-3.1, US-3.2, US-3.3 |
+| M5: Sharing | US-5.1 through US-5.6 |
+| M6: Polish | US-6.1, US-6.2, US-7.1, US-7.2, US-7.3 |
+
 ### Git Workflow
 
 **Always branch from main** — see `docs/devops/github-workflow.md#starting-new-work`
@@ -141,3 +162,5 @@ This file contains:
 - Current task and position in project plan
 - Any blockers
 - Session workflow instructions
+
+📋 **For each task, also read the linked user stories in `docs/product/user-stories-phase1.md`**

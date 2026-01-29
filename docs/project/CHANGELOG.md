@@ -41,6 +41,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Route for `/board` Kanban board page
 - AppLayout component for authenticated pages
 - Sidebar navigation component with responsive mobile menu
+- ActionItemDetailModal component with view/edit modes and delete confirmation
+- Action item click-to-open integration in BoardPage
+- ActionItemCreateModal component for manual action item creation
+- Drag-and-drop action items between Kanban columns with @dnd-kit
+- DraggableActionItemCard wrapper component
+- Optimistic updates for drag-and-drop with rollback on error
+- Keyboard navigation support for drag-and-drop
+- Source note navigation from action items (Task 3.8) - links to source note, "Note deleted" for orphaned items, hidden for manual items
 
 ### Changed
 - Reformatted CLAUDE.md "First Time Setup" section for consistency

@@ -309,75 +309,75 @@
 
 ---
 
-### Task 3.4: Action Item Card Component
+### Task 3.4: Action Item Card Component ✅
 
 **Description:** Build the card component for displaying action items.
 
 **Subtasks:**
-- [ ] Create action item card component
-- [ ] Display: title, priority badge (color-coded), due date, source note link
-- [ ] Make card clickable to open detail view
-- [ ] Add "Mark done" checkbox/button for quick completion
-- [ ] Add "Move to..." dropdown menu
-- [ ] Show visual distinction for overdue items (optional)
+- [x] Create action item card component
+- [x] Display: title, priority badge (color-coded), due date, source note link
+- [x] Make card clickable to open detail view
+- [x] Add "Mark done" checkbox/button for quick completion
+- [x] Add "Move to..." dropdown menu
+- [x] Show visual distinction for overdue items (optional)
 
 ---
 
-### Task 3.5: Drag and Drop Functionality
+### Task 3.5: Drag and Drop Functionality ✅
 
 **Description:** Implement drag-and-drop to move items between columns.
 
 **Subtasks:**
-- [ ] Install drag-drop library (e.g., @dnd-kit, react-beautiful-dnd)
-- [ ] Make action item cards draggable
-- [ ] Add drop zones for each column
-- [ ] Show visual feedback during drag (card follows cursor, zones highlighted)
-- [ ] Call PATCH status endpoint on drop
-- [ ] Handle optimistic updates with rollback on error
-- [ ] Persist reordering within columns (position field)
+- [x] Install drag-drop library (e.g., @dnd-kit, react-beautiful-dnd)
+- [x] Make action item cards draggable
+- [x] Add drop zones for each column
+- [x] Show visual feedback during drag (card follows cursor, zones highlighted)
+- [x] Call PATCH status endpoint on drop
+- [x] Handle optimistic updates with rollback on error
+- [x] Persist reordering within columns (position field)
 
 ---
 
-### Task 3.6: Action Item Detail/Edit Modal
+### Task 3.6: Action Item Detail/Edit Modal ✅
 
 **Description:** Create modal for viewing and editing action item details.
 
 **Subtasks:**
-- [ ] Create detail modal/drawer component
-- [ ] Display all fields: title, description, priority, due date, status, source note, dates
-- [ ] Add "Edit" button to enter edit mode
-- [ ] Edit form with all editable fields
-- [ ] Priority dropdown (High/Medium/Low)
-- [ ] Status dropdown (To Do/Doing/Done)
-- [ ] Due date picker
-- [ ] "Save" and "Cancel" buttons
-- [ ] "Delete" button with confirmation
+- [x] Create detail modal/drawer component
+- [x] Display all fields: title, description, priority, due date, status, source note, dates
+- [x] Add "Edit" button to enter edit mode
+- [x] Edit form with all editable fields
+- [x] Priority dropdown (High/Medium/Low)
+- [x] Status dropdown (To Do/Doing/Done)
+- [x] Due date picker
+- [x] "Save" and "Cancel" buttons
+- [x] "Delete" button with confirmation
 
 ---
 
-### Task 3.7: Manual Action Item Creation
+### Task 3.7: Manual Action Item Creation ✅
 
 **Description:** Allow users to create action items without extraction.
 
 **Subtasks:**
-- [ ] Create "Add action item" modal/form
-- [ ] Fields: title (required), description, priority, due date, status
-- [ ] Default priority to Medium, status to To Do
-- [ ] Call POST endpoint on save
-- [ ] Add new item to appropriate column
-- [ ] Show success feedback
+- [x] Create "Add action item" modal/form
+- [x] Fields: title (required), description, priority, due date, status
+- [x] Default priority to Medium, status to To Do
+- [x] Call POST endpoint on save
+- [x] Add new item to appropriate column
+- [x] Show success feedback
 
 ---
 
-### Task 3.8: Source Note Navigation
+### Task 3.8: Source Note Navigation ✅
 
 **Description:** Allow navigation from action item to its source meeting note.
 
 **Subtasks:**
-- [ ] Display "Source note" link on action items with meeting_note_id
-- [ ] Make link clickable, navigate to `/notes/:id`
-- [ ] Show "Note deleted" label (non-clickable) if source note was deleted
-- [ ] Hide source link for manually created items
+- [x] Display "Source note" link on action items with meeting_note_id
+- [x] Make link clickable, navigate to `/notes/:id`
+- [x] Show "Note deleted" label (non-clickable) if source note was deleted
+- [x] Hide source link for manually created items
 
 ---
 

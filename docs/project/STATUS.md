@@ -1,14 +1,14 @@
 # Project Status
 
-> Last Updated: 2026-01-22
+> Last Updated: 2026-01-27
 > Updated By: Claude Code
 
 ## Current Position
 
 **Phase:** 1 (MVP)
-**Milestone:** M3 - Action Items & Kanban Board
-**Task:** 3.4 - Action Item Card Component
-**Status:** Not Started
+**Milestone:** M3 - Action Items & Kanban Board (COMPLETE)
+**Task:** Ready for M4 - AI Action-Item Extraction
+**Status:** M3 Complete
 
 → See `project-plan.md` for full task details and subtasks
 
@@ -21,9 +21,9 @@
 ## Session Context
 
 ### Current Task Reference
-- **Location:** `project-plan.md` → Milestone 3 → Task 3.4
-- **Files to modify:** `apps/web/src/components/`
-- **Reference docs:** `docs/guidelines/frontend_guidelines.md`, `docs/engineering/api-spec.md`
+- **Location:** `project-plan.md` → Milestone 4 → Task 4.1
+- **Files to modify:** TBD (Claude API integration)
+- **Reference docs:** `docs/engineering/api-spec.md`
 
 ### Recent Decisions
 | Date | Decision | Rationale |
@@ -33,6 +33,57 @@
 | 2026-01-20 | devops/ folder | Separate operational from state docs |
 
 ### Session Log
+**2026-01-27 - Milestone 3 Complete (Task 3.8)**
+- Verified Task 3.8 (Source Note Navigation) was already implemented in Tasks 3.4 and 3.6
+- `ActionItemCard.tsx`: Shows source note link, handles deleted notes, hides for manual items
+- `ActionItemDetailModal.tsx`: Shows source note link in detail view with same logic
+- Backend includes `meetingNote` relation in list and get endpoints
+- All US-4.9 acceptance criteria satisfied
+- **Milestone 3 (Action Items & Kanban Board) is now complete**
+- Next: Start M4 Task 4.1 - Claude API Integration
+
+**2026-01-24 - Task 3.7 Complete**
+- Created `apps/web/src/components/ActionItemCreateModal.tsx` - Modal form for manual action item creation
+- Updated `apps/web/src/pages/BoardPage.tsx` - Added create button and modal integration
+- Features: title (required), description, priority dropdown, due date picker, status dropdown
+- Form validation with react-hook-form, default priority Medium, default status To Do
+- Success toast notification on creation
+- Items automatically appear in appropriate column via React Query invalidation
+- Committed and pushed to `feature/action-item-cards` branch (closes #21)
+- Next: Start Task 3.8 - Source Note Navigation
+
+**2026-01-23 - Task 3.6 Complete**
+- Created `apps/web/src/components/ActionItemDetailModal.tsx`
+- View mode: displays title, priority, status, due date, description, source note, timestamps
+- Edit mode: form with validation (title required), priority/status dropdowns, date picker
+- Delete with confirmation dialog (reuses ConfirmDialog)
+- Integrated with BoardPage via card click handler
+- PR #3 updated to include Task 3.6
+- Next: Start Task 3.7 - Manual Action Item Creation
+
+**2026-01-23 - Task 3.5 Complete**
+- Installed @dnd-kit/core, @dnd-kit/sortable, @dnd-kit/utilities
+- Created `apps/web/src/components/DraggableActionItemCard.tsx` - Sortable wrapper using useSortable
+- Updated `apps/web/src/components/KanbanColumn.tsx` - Added useDroppable and SortableContext
+- Updated `apps/web/src/pages/BoardPage.tsx` - DndContext with sensors, drag overlay, and handlers
+- Updated `apps/web/src/services/action-items.service.ts` - Added updatePosition and moveItem methods
+- Updated `apps/web/src/hooks/useActionItems.ts` - Added useMoveActionItem with optimistic updates
+- Features: drag cards between columns, visual feedback (blue highlight on drop zones), drag overlay with rotation
+- Optimistic updates with rollback on error
+- Keyboard navigation support (tab, space/enter to pick up, arrows to move)
+- Next: Start Task 3.6 - Action Item Detail/Edit Modal
+
+**2026-01-23 - Task 3.4 Complete**
+- Created `apps/web/src/components/ActionItemCard.tsx` - Full-featured action item card
+- Features: title with strikethrough when done, color-coded priority badge, due date with overdue indicator
+- Source note link (navigates to note, shows "Note deleted" if source deleted)
+- "Mark done" checkbox for quick completion (green checkmark when done)
+- "Move to..." dropdown menu for status changes
+- Overdue items have red border and background highlight
+- Updated `KanbanColumn.tsx` to use new ActionItemCard component
+- Wired up `BoardPage.tsx` with status change handler using `useUpdateActionItemStatus`
+- Next: Start Task 3.5 - Drag and Drop Functionality
+
 **2026-01-22 - Task 6.1 Complete (moved earlier)**
 - Created AppLayout and Sidebar components in `apps/web/src/components/layouts/`
 - Implemented nested routing in App.tsx with AppLayout wrapper

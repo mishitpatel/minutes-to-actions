@@ -22,6 +22,9 @@ const envSchema = z.object({
   // App URLs
   API_URL: z.string().url().default('http://localhost:3000'),
   WEB_URL: z.string().url().default('http://localhost:5173'),
+
+  // Claude API (Anthropic)
+  ANTHROPIC_API_KEY: z.string().min(1, 'ANTHROPIC_API_KEY is required'),
 });
 
 export type Env = z.infer<typeof envSchema>;

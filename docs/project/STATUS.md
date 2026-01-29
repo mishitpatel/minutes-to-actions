@@ -1,14 +1,14 @@
 # Project Status
 
-> Last Updated: 2026-01-27
+> Last Updated: 2026-01-28
 > Updated By: Claude Code
 
 ## Current Position
 
 **Phase:** 1 (MVP)
-**Milestone:** M3 - Action Items & Kanban Board (COMPLETE)
-**Task:** Ready for M4 - AI Action-Item Extraction
-**Status:** M3 Complete
+**Milestone:** M4 - AI Action-Item Extraction
+**Task:** Task 4.2 - Extraction Endpoint Implementation
+**Status:** Task 4.1 Complete
 
 → See `project-plan.md` for full task details and subtasks
 
@@ -21,8 +21,8 @@
 ## Session Context
 
 ### Current Task Reference
-- **Location:** `project-plan.md` → Milestone 4 → Task 4.1
-- **Files to modify:** TBD (Claude API integration)
+- **Location:** `project-plan.md` → Milestone 4 → Task 4.2
+- **Files to modify:** `apps/api/src/modules/meeting-notes/` (add extraction endpoint)
 - **Reference docs:** `docs/engineering/api-spec.md`
 
 ### Recent Decisions
@@ -33,6 +33,18 @@
 | 2026-01-20 | devops/ folder | Separate operational from state docs |
 
 ### Session Log
+**2026-01-28 - Task 4.1 Complete (Claude API Integration)**
+- Created `apps/api/src/services/claude.ts` - Claude API client with extractActionItems() function
+- Added `ANTHROPIC_API_KEY` environment variable to env.ts and .env.example
+- Installed `@anthropic-ai/sdk` package
+- Added `ExtractionError` and `RateLimitError` custom error classes
+- Designed system prompt for reliable JSON extraction of action items
+- Created comprehensive unit tests with mocked SDK (9 tests)
+- Handles rate limits (429), auth errors (401), timeouts, and invalid responses
+- Model: claude-sonnet-4-20250514, Temperature: 0.1, Max tokens: 2048
+- Closed GitHub issue #23
+- **Next: Start Task 4.2 - Extraction Endpoint Implementation**
+
 **2026-01-27 - Milestone 3 Complete (Task 3.8)**
 - Verified Task 3.8 (Source Note Navigation) was already implemented in Tasks 3.4 and 3.6
 - `ActionItemCard.tsx`: Shows source note link, handles deleted notes, hides for manual items

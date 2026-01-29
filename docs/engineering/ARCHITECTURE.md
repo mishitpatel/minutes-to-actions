@@ -65,16 +65,16 @@ Minutes to Actions is a productivity tool that extracts action-items from meetin
 
 ### Frontend
 
-| Technology | Purpose |
-|------------|---------|
-| React 18 | UI Framework |
-| TypeScript | Type Safety |
-| Vite | Build Tool |
+| Technology     | Purpose                |
+| -------------- | ---------------------- |
+| React 18       | UI Framework           |
+| TypeScript     | Type Safety            |
+| Vite           | Build Tool             |
 | TanStack Query | Server State & Caching |
-| React Router | Client-side Routing |
-| Tailwind CSS | Styling |
-| dnd-kit | Drag and Drop (Kanban) |
-| Zod | Form Validation |
+| React Router   | Client-side Routing    |
+| Tailwind CSS   | Styling                |
+| dnd-kit        | Drag and Drop (Kanban) |
+| Zod            | Form Validation        |
 
 ### Backend
 

@@ -1,15 +1,15 @@
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
-import type { ActionItem, Status } from '../services/action-items.service';
+import type { ActionItemWithSource, Status } from '../services/action-items.service';
 import { DraggableActionItemCard } from './DraggableActionItemCard';
 
 interface KanbanColumnProps {
   title: string;
   status: Status;
-  items: ActionItem[];
+  items: ActionItemWithSource[];
   onAddItem?: () => void;
   onStatusChange?: (id: string, status: Status) => void;
-  onItemClick?: (item: ActionItem) => void;
+  onItemClick?: (item: ActionItemWithSource) => void;
 }
 
 export function KanbanColumn({ title, status, items, onAddItem, onStatusChange, onItemClick }: KanbanColumnProps) {

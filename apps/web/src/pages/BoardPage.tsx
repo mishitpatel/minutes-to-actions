@@ -17,13 +17,13 @@ import { KanbanColumn } from '../components/KanbanColumn';
 import { ActionItemCard } from '../components/ActionItemCard';
 import { ActionItemDetailModal } from '../components/ActionItemDetailModal';
 import { ActionItemCreateModal } from '../components/ActionItemCreateModal';
-import type { Status, ActionItem } from '../services/action-items.service';
+import type { Status, ActionItemWithSource } from '../services/action-items.service';
 
 export function BoardPage() {
   const { items, isLoading, isError, refetch } = useActionItems();
   const updateStatus = useUpdateActionItemStatus();
   const moveItem = useMoveActionItem();
-  const [activeItem, setActiveItem] = useState<ActionItem | null>(null);
+  const [activeItem, setActiveItem] = useState<ActionItemWithSource | null>(null);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [createDefaultStatus, setCreateDefaultStatus] = useState<Status>('todo');
@@ -48,11 +48,11 @@ export function BoardPage() {
     updateStatus.mutate({ id, status });
   };
 
-  const handleItemClick = (item: ActionItem) => {
+  const handleItemClick = (item: ActionItemWithSource) => {
     setSelectedItemId(item.id);
   };
 
-  const findItemById = (id: string): { item: ActionItem; status: Status } | null => {
+  const findItemById = (id: string): { item: ActionItemWithSource; status: Status } | null => {
     for (const status of ['todo', 'doing', 'done'] as Status[]) {
       const item = items[status].find((i) => i.id === id);
       if (item) {

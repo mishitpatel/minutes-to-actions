@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import type { ActionItem, Status } from '../services/action-items.service';
+import type { ActionItemWithSource, Status } from '../services/action-items.service';
 
 interface ActionItemCardProps {
-  item: ActionItem & { meeting_note?: { id: string; title: string | null } | null };
+  item: ActionItemWithSource;
   onStatusChange?: (id: string, status: Status) => void;
-  onClick?: (item: ActionItem) => void;
+  onClick?: (item: ActionItemWithSource) => void;
 }
 
 const PRIORITY_STYLES = {

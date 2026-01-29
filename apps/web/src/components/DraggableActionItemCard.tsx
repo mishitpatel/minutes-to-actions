@@ -1,12 +1,12 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { ActionItemCard } from './ActionItemCard';
-import type { ActionItem, Status } from '../services/action-items.service';
+import type { ActionItemWithSource, Status } from '../services/action-items.service';
 
 interface DraggableActionItemCardProps {
-  item: ActionItem & { meeting_note?: { id: string; title: string | null } | null };
+  item: ActionItemWithSource;
   onStatusChange?: (id: string, status: Status) => void;
-  onClick?: (item: ActionItem) => void;
+  onClick?: (item: ActionItemWithSource) => void;
 }
 
 export function DraggableActionItemCard({ item, onStatusChange, onClick }: DraggableActionItemCardProps) {

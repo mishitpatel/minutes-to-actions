@@ -71,7 +71,7 @@ async function verifyOwnership(id: string, userId: string): Promise<{
 }
 
 export interface ListActionItemsResult {
-  data: ActionItemResponse[] | GroupedActionItems;
+  data: ActionItemWithSource[] | GroupedActionItems;
 }
 
 export async function listActionItems(
@@ -88,9 +88,22 @@ export async function listActionItems(
   const items = await prisma.actionItem.findMany({
     where,
     orderBy: [{ status: 'asc' }, { position: 'asc' }, { createdAt: 'desc' }],
+    include: {
+      meetingNote: {
+        select: {
+          id: true,
+          title: true,
+        },
+      },
+    },
   });
 
-  const transformedItems = items.map(toActionItemResponse);
+  const transformedItems: ActionItemWithSource[] = items.map((item) => ({
+    ...toActionItemResponse(item),
+    meeting_note: item.meetingNote
+      ? { id: item.meetingNote.id, title: item.meetingNote.title }
+      : null,
+  }));
 
   if (grouped && !status) {
     // Group by status

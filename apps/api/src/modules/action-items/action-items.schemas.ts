@@ -76,14 +76,14 @@ export const actionItemWithSourceSchema = actionItemResponseSchema.extend({
 });
 
 export const groupedActionItemsSchema = z.object({
-  todo: z.array(actionItemResponseSchema),
-  doing: z.array(actionItemResponseSchema),
-  done: z.array(actionItemResponseSchema),
+  todo: z.array(actionItemWithSourceSchema),
+  doing: z.array(actionItemWithSourceSchema),
+  done: z.array(actionItemWithSourceSchema),
 });
 
 // List response schemas (for different modes)
 export const actionItemListResponseSchema = z.object({
-  data: z.array(actionItemResponseSchema),
+  data: z.array(actionItemWithSourceSchema),
 });
 
 export const groupedActionItemsResponseSchema = z.object({
@@ -92,7 +92,7 @@ export const groupedActionItemsResponseSchema = z.object({
 
 // Combined list response schema for typed routes (accepts either format)
 export const listActionItemsResponseSchema = z.object({
-  data: z.union([z.array(actionItemResponseSchema), groupedActionItemsSchema]),
+  data: z.union([z.array(actionItemWithSourceSchema), groupedActionItemsSchema]),
 });
 
 export const singleActionItemResponseSchema = z.object({

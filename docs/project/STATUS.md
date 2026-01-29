@@ -1,14 +1,14 @@
 # Project Status
 
-> Last Updated: 2026-01-24
+> Last Updated: 2026-01-27
 > Updated By: Claude Code
 
 ## Current Position
 
 **Phase:** 1 (MVP)
-**Milestone:** M3 - Action Items & Kanban Board
-**Task:** 3.8 - Source Note Navigation
-**Status:** Not Started
+**Milestone:** M3 - Action Items & Kanban Board (COMPLETE)
+**Task:** Ready for M4 - AI Action-Item Extraction
+**Status:** M3 Complete
 
 → See `project-plan.md` for full task details and subtasks
 
@@ -21,9 +21,9 @@
 ## Session Context
 
 ### Current Task Reference
-- **Location:** `project-plan.md` → Milestone 3 → Task 3.8
-- **Files to modify:** `apps/web/src/components/ActionItemCard.tsx`
-- **Reference docs:** `docs/guidelines/frontend_guidelines.md`
+- **Location:** `project-plan.md` → Milestone 4 → Task 4.1
+- **Files to modify:** TBD (Claude API integration)
+- **Reference docs:** `docs/engineering/api-spec.md`
 
 ### Recent Decisions
 | Date | Decision | Rationale |
@@ -33,6 +33,15 @@
 | 2026-01-20 | devops/ folder | Separate operational from state docs |
 
 ### Session Log
+**2026-01-27 - Milestone 3 Complete (Task 3.8)**
+- Verified Task 3.8 (Source Note Navigation) was already implemented in Tasks 3.4 and 3.6
+- `ActionItemCard.tsx`: Shows source note link, handles deleted notes, hides for manual items
+- `ActionItemDetailModal.tsx`: Shows source note link in detail view with same logic
+- Backend includes `meetingNote` relation in list and get endpoints
+- All US-4.9 acceptance criteria satisfied
+- **Milestone 3 (Action Items & Kanban Board) is now complete**
+- Next: Start M4 Task 4.1 - Claude API Integration
+
 **2026-01-24 - Task 3.7 Complete**
 - Created `apps/web/src/components/ActionItemCreateModal.tsx` - Modal form for manual action item creation
 - Updated `apps/web/src/pages/BoardPage.tsx` - Added create button and modal integration

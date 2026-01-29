@@ -369,15 +369,15 @@
 
 ---
 
-### Task 3.8: Source Note Navigation
+### Task 3.8: Source Note Navigation ✅
 
 **Description:** Allow navigation from action item to its source meeting note.
 
 **Subtasks:**
-- [ ] Display "Source note" link on action items with meeting_note_id
-- [ ] Make link clickable, navigate to `/notes/:id`
-- [ ] Show "Note deleted" label (non-clickable) if source note was deleted
-- [ ] Hide source link for manually created items
+- [x] Display "Source note" link on action items with meeting_note_id
+- [x] Make link clickable, navigate to `/notes/:id`
+- [x] Show "Note deleted" label (non-clickable) if source note was deleted
+- [x] Hide source link for manually created items
 
 ---
 

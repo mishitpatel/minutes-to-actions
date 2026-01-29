@@ -48,6 +48,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - DraggableActionItemCard wrapper component
 - Optimistic updates for drag-and-drop with rollback on error
 - Keyboard navigation support for drag-and-drop
+- Source note navigation from action items (Task 3.8) - links to source note, "Note deleted" for orphaned items, hidden for manual items
 
 ### Changed
 - Reformatted CLAUDE.md "First Time Setup" section for consistency

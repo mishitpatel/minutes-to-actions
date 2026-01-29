@@ -27,9 +27,9 @@ export interface ActionItemWithSource extends ActionItem {
 }
 
 export interface GroupedActionItems {
-  todo: ActionItem[];
-  doing: ActionItem[];
-  done: ActionItem[];
+  todo: ActionItemWithSource[];
+  doing: ActionItemWithSource[];
+  done: ActionItemWithSource[];
 }
 
 export interface CreateActionItemData {

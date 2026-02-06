@@ -78,6 +78,25 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
 
+## Actual CI Workflows
+
+The real workflows in `.github/workflows/` are:
+
+### API Tests (`.github/workflows/api-tests.yml`)
+
+- **Triggers:** Pull request to `main`, manual dispatch
+- **Runs:** `pnpm test:api:report` (console + JSON/JUnit output)
+- **Services:** Starts PostgreSQL + Redis via docker-compose, runs migrations
+- **Artifacts:** Uploads `api-test-results/` (always, 7-day retention)
+
+### E2E Tests (`.github/workflows/e2e.yml`)
+
+- **Triggers:** Pull request to `main`, manual dispatch (with browser selection)
+- **Runs:** Playwright tests (Chromium by default, or selected browser/all)
+- **Services:** Starts PostgreSQL + Redis via docker-compose, runs migrations
+- **Artifacts:** Uploads `playwright-report/` (on failure only, 7-day retention)
+- **Manual options:** `chromium` (default), `all`, `firefox`, `webkit`, `mobile-chrome`
+
 ## Pipeline Overview
 
 ```
@@ -86,33 +105,37 @@ Push to feature branch
          ▼
     PR Created
          │
-         ▼
-┌─────────────────────┐
-│     CI Pipeline     │
-├─────────────────────┤
-│ 1. Checkout code    │
-│ 2. Install deps     │
-│ 3. Lint check       │
-│ 4. Type check       │
-│ 5. Run tests        │
-│ 6. Build            │
-└─────────────────────┘
-         │
-         ▼
-    PR Approved
-         │
-         ▼
-   Merge to main
-         │
-         ▼
-┌─────────────────────┐
-│   Deploy Pipeline   │
-├─────────────────────┤
-│ 1. Deploy to staging│
-│ 2. Run smoke tests  │
-│ 3. Deploy to prod   │
-│    (manual trigger) │
-└─────────────────────┘
+         ├──────────────────────────────────┐
+         ▼                                  ▼
+┌─────────────────────┐    ┌──────────────────────────┐
+│   API Tests Job     │    │     E2E Tests Job        │
+├─────────────────────┤    ├──────────────────────────┤
+│ 1. Checkout code    │    │ 1. Checkout code         │
+│ 2. Install deps     │    │ 2. Install deps          │
+│ 3. Start services   │    │ 3. Install browsers      │
+│ 4. Run migrations   │    │ 4. Start services        │
+│ 5. pnpm test:api:   │    │ 5. Run migrations        │
+│    report           │    │ 6. Run Playwright tests  │
+│ 6. Upload results   │    │ 7. Upload report         │
+│    (always)         │    │    (on failure)           │
+└─────────────────────┘    └──────────────────────────┘
+         │                                  │
+         └──────────────┬───────────────────┘
+                        ▼
+                   PR Approved
+                        │
+                        ▼
+                  Merge to main
+                        │
+                        ▼
+              ┌─────────────────────┐
+              │   Deploy Pipeline   │
+              ├─────────────────────┤
+              │ 1. Deploy to staging│
+              │ 2. Run smoke tests  │
+              │ 3. Deploy to prod   │
+              │    (manual trigger) │
+              └─────────────────────┘
 ```
 
 ## Environment Variables

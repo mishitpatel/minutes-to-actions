@@ -25,7 +25,7 @@ export default async function actionItemsRoutes(fastify: FastifyInstance) {
   f.get(
     '/action-items',
     {
-      preHandler: [fastify.authenticate],
+      onRequest: [fastify.authenticate],
       schema: {
         description: 'List all action items, optionally filtered by status. Returns grouped by status by default.',
         tags: ['action-items'],
@@ -46,7 +46,7 @@ export default async function actionItemsRoutes(fastify: FastifyInstance) {
   f.get(
     '/action-items/:id',
     {
-      preHandler: [fastify.authenticate],
+      onRequest: [fastify.authenticate],
       schema: {
         description: 'Get a single action item by ID with its source meeting note info',
         tags: ['action-items'],
@@ -71,7 +71,7 @@ export default async function actionItemsRoutes(fastify: FastifyInstance) {
   f.post(
     '/action-items',
     {
-      preHandler: [fastify.authenticate],
+      onRequest: [fastify.authenticate],
       schema: {
         description: 'Create a new action item',
         tags: ['action-items'],
@@ -95,7 +95,7 @@ export default async function actionItemsRoutes(fastify: FastifyInstance) {
   f.post(
     '/action-items/bulk',
     {
-      preHandler: [fastify.authenticate],
+      onRequest: [fastify.authenticate],
       schema: {
         description: 'Bulk create action items from meeting note extraction',
         tags: ['action-items'],
@@ -120,7 +120,7 @@ export default async function actionItemsRoutes(fastify: FastifyInstance) {
   f.put(
     '/action-items/:id',
     {
-      preHandler: [fastify.authenticate],
+      onRequest: [fastify.authenticate],
       schema: {
         description: 'Update an existing action item',
         tags: ['action-items'],
@@ -147,7 +147,7 @@ export default async function actionItemsRoutes(fastify: FastifyInstance) {
   f.patch(
     '/action-items/:id/status',
     {
-      preHandler: [fastify.authenticate],
+      onRequest: [fastify.authenticate],
       schema: {
         description: 'Update action item status (for Kanban drag-drop)',
         tags: ['action-items'],
@@ -174,7 +174,7 @@ export default async function actionItemsRoutes(fastify: FastifyInstance) {
   f.patch(
     '/action-items/:id/position',
     {
-      preHandler: [fastify.authenticate],
+      onRequest: [fastify.authenticate],
       schema: {
         description: 'Update action item position within column (for reordering)',
         tags: ['action-items'],
@@ -201,7 +201,7 @@ export default async function actionItemsRoutes(fastify: FastifyInstance) {
   f.delete(
     '/action-items/:id',
     {
-      preHandler: [fastify.authenticate],
+      onRequest: [fastify.authenticate],
       schema: {
         description: 'Delete an action item',
         tags: ['action-items'],

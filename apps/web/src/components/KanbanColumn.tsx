@@ -30,7 +30,7 @@ export function KanbanColumn({ title, status, items, onAddItem, onStatusChange, 
   const itemIds = items.map((item) => item.id);
 
   return (
-    <div className={`flex flex-col bg-gray-100 rounded-lg border-t-4 ${columnColors[status]} min-w-[280px] max-w-[350px] flex-1`}>
+    <div className={`flex flex-col bg-gray-100 rounded-lg border-t-4 ${columnColors[status]} min-w-[280px] max-w-[350px] flex-1`} data-testid={`column-${status}`}>
       <div className="p-3 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">

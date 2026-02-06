@@ -23,6 +23,14 @@ export function useAuth() {
     onSuccess: () => {
       queryClient.setQueryData(AUTH_QUERY_KEY, null);
       queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEY });
+      window.location.href = '/login';
+    },
+    onError: () => {
+      // Even if the API call fails, clear local state and redirect
+      // This ensures the user can always log out from the UI
+      queryClient.setQueryData(AUTH_QUERY_KEY, null);
+      queryClient.invalidateQueries({ queryKey: AUTH_QUERY_KEY });
+      window.location.href = '/login';
     },
   });
 

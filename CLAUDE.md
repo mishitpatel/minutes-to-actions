@@ -19,6 +19,9 @@ apps/
 └── api/                  # Node.js backend (Fastify)
 packages/
 └── shared/               # Shared types, utilities, constants
+tests/
+├── api/                  # API E2E tests (Vitest + Fastify inject)
+└── e2e/                  # Browser E2E tests (Playwright)
 docs/
 ├── project/              # Status, plan, changelog
 ├── devops/               # Commands, CI/CD, troubleshooting
@@ -32,7 +35,12 @@ docs/
 ```bash
 pnpm install          # Install dependencies
 pnpm dev              # Start frontend (5173) + backend (3000)
-pnpm test             # Run tests
+pnpm test             # Run unit tests
+pnpm test:api         # Run API E2E tests
+pnpm test:api:report  # Generate JSON + JUnit test reports
+pnpm test:api:ui      # Open interactive Vitest UI
+pnpm test:api:coverage  # Generate test coverage report
+pnpm test:e2e         # Run Browser E2E tests
 pnpm build            # Build for production
 pnpm lint             # Check code quality
 ```
@@ -112,11 +120,11 @@ git checkout main && git pull origin main && git checkout -b feature/xyz
 
 **Creating a New Module:**
 1. Create folder: `src/modules/[feature]/`
-2. Create files (3-file pattern):
+2. Create files:
    - `[feature].schemas.ts` — Zod schemas + inferred types
    - `[feature].handler.ts` — Business logic (pure functions, no classes)
    - `[feature].routes.ts` — HTTP wiring with `withTypeProvider<ZodTypeProvider>()`
-   - `[feature].test.ts` — Co-located tests
+   - `[feature].test.ts` — Co-located unit tests
 3. Import common schemas from `@/schemas/common`
 4. Use custom errors from `@/utils/errors`
 5. Define Zod schemas for all request/response types
@@ -143,7 +151,7 @@ if (!resource) throw new NotFoundError('Resource not found');
 
 | Category    | Key Files                                                              |
 | ----------- | ---------------------------------------------------------------------- |
-| Project     | `STATUS.md`, `project-plan.md`, `changelog.md`                         |
+| Project     | `project-status.md`, `project-plan.md`, `changelog.md`                 |
 | DevOps      | `commands.md`, `github-workflow.md`, `troubleshooting.md`              |
 | Product     | `product-spec.md`, `user-stories-phase1.md`                            |
 | Engineering | `api-spec.md`, `database-schema.md`, `architecture.md`                 |
@@ -156,7 +164,7 @@ All docs in `docs/` directory.
 
 ## Session Continuity
 
-📍 **Start every session by reading `docs/project/STATUS.md`**
+📍 **Start every session by reading `docs/project/project-status.md`**
 
 This file contains:
 - Current task and position in project plan
@@ -164,3 +172,49 @@ This file contains:
 - Session workflow instructions
 
 📋 **For each task, also read the linked user stories in `docs/product/user-stories-phase1.md`**
+
+---
+
+## Test Generation (Suggested Mode)
+
+After completing API endpoints or user-facing features, **suggest** generating tests:
+
+### When to Suggest Tests
+
+- After creating/modifying API endpoints → Suggest API E2E tests
+- After creating/modifying UI features → Suggest Browser E2E tests
+- After fixing bugs → Suggest regression tests
+
+### How to Suggest
+
+```
+"I've completed [feature]. Would you like me to generate:
+- API E2E test for [endpoint]
+- Browser E2E test for [user flow]"
+```
+
+### Test Generation Skills
+
+| Skill | Command | Purpose |
+|-------|---------|---------|
+| API Test Generator | `/api-test-generator [module]` | Generate Vitest + Fastify inject tests |
+| API Test Generator (check) | `/api-test-generator [module] --check` | Report test coverage gaps only (no code) |
+| E2E Test Generator | `/e2e-test-generator [flow]` | Generate Playwright tests |
+
+### Test Locations
+
+| Test Type | Location | Command |
+|-----------|----------|---------|
+| Unit Tests | `apps/*/src/**/*.test.ts` (co-located) | `pnpm test` |
+| API E2E | `tests/api/*.test.ts` | `pnpm test:api` |
+| API E2E (report) | `api-test-results/` | `pnpm test:api:report` |
+| API E2E (interactive) | Browser UI | `pnpm test:api:ui` |
+| API E2E (coverage) | `coverage/` | `pnpm test:api:coverage` |
+| Browser E2E | `tests/e2e/*.spec.ts` | `pnpm test:e2e` |
+
+### Patterns Reference
+
+- API patterns: `.claude/skills/api-test-generator.md`
+- E2E patterns: `.claude/skills/e2e-test-generator.md`
+
+**IMPORTANT:** Do NOT auto-generate tests without user confirmation. Always suggest first.

@@ -41,6 +41,7 @@ All endpoints except `/auth/*` and `/shared/:token` require authentication via s
 | POST | `/meeting-notes` | Create new meeting note |
 | PUT | `/meeting-notes/:id` | Update meeting note |
 | DELETE | `/meeting-notes/:id` | Delete meeting note |
+| POST | `/meeting-notes/:id/extract` | Extract action items using AI |
 
 ### Action Items Module
 
@@ -118,6 +119,13 @@ Returns current authenticated user.
 Ends current session.
 
 **Response (204):** No content (session cookie cleared)
+
+### Auth Behavior Notes
+- OAuth flow: GET /auth/google → redirect → callback → set session cookie
+- Session cookie: `session_token`, httpOnly, secure in prod, 30-day expiry
+- Upsert on login: Match on googleId, update name/avatar if exists, create if new
+- Test login: deterministic `test-user-{email}` googleId, blocked in production
+- Logout: Deletes session from DB, clears cookie
 
 ---
 
@@ -248,6 +256,58 @@ Delete meeting note. Linked action-items become orphaned (not deleted).
 **Response (204):** No content
 
 **Response (404):** Not found
+
+#### `POST /meeting-notes/:id/extract`
+Extract action items from a meeting note using AI. Returns extracted items for review — does NOT save them.
+
+**Response (200):**
+```json
+{
+  "data": {
+    "action_items": [
+      {
+        "title": "Update documentation",
+        "priority": "high",
+        "due_date": "2026-02-10",
+        "description": "John to update by Friday"
+      },
+      {
+        "title": "Review PR #123",
+        "priority": "medium",
+        "due_date": null,
+        "description": null
+      }
+    ],
+    "confidence": "high",
+    "message": null
+  }
+}
+```
+
+**Response (200 - no items found):**
+```json
+{
+  "data": {
+    "action_items": [],
+    "confidence": "high",
+    "message": "No action items found in this meeting note."
+  }
+}
+```
+
+**Response (404):** Not found
+**Response (429):** Rate limited (AI service temporarily unavailable)
+**Response (500):** Extraction failed
+
+---
+
+### Meeting Notes Behavior Notes
+- Title defaults to null if not provided
+- Body required: must be non-empty string (min 1 char)
+- Pagination defaults: page=1, limit=20 (max 100)
+- Ordering: createdAt DESC (newest first)
+- Delete cascade: Linked action items get meetingNoteId set to NULL
+- Ownership: Returns 404 for both missing and other-user resources
 
 ---
 
@@ -414,6 +474,16 @@ Delete action-item.
 
 **Response (204):** No content
 
+### Action Items Behavior Notes
+- Status defaults to 'todo', priority defaults to 'medium'
+- Position auto-calc: max(position in same status) + 1
+- Status change auto-repositions to end of new status column
+- Grouped response: Default when grouped=true AND no status filter
+- Meeting note linking: Verifies note exists and belongs to user
+- UUID validation: :id params must be valid UUIDs
+- PUT is partial: All fields optional in update body
+- Ordering: status ASC → position ASC → createdAt DESC
+
 ---
 
 ### Board Share
@@ -563,6 +633,7 @@ Fastify+Zod validation errors return this format:
 | `FORBIDDEN` | 403 | Not authorized |
 | `NOT_FOUND` | 404 | Resource not found |
 | `EXTRACTION_FAILED` | 500 | AI extraction failed |
+| `RATE_LIMITED` | 429 | AI service rate limit exceeded |
 | `INTERNAL_ERROR` | 500 | Server error |
 
 ---

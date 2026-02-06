@@ -4,7 +4,12 @@ import { z } from 'zod';
 import { env } from '../../config/env.js';
 import { SESSION_COOKIE_NAME } from '../../plugins/auth.js';
 import { errorResponseSchema } from '../../schemas/index.js';
-import { callbackQuerySchema, meResponseSchema } from './auth.schemas.js';
+import {
+  callbackQuerySchema,
+  meResponseSchema,
+  testLoginBodySchema,
+  testLoginResponseSchema,
+} from './auth.schemas.js';
 import * as handler from './auth.handler.js';
 
 export default async function authRoutes(fastify: FastifyInstance) {
@@ -100,7 +105,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
   f.get(
     '/auth/me',
     {
-      preHandler: [fastify.authenticate],
+      onRequest: [fastify.authenticate],
       schema: {
         description: 'Get the currently authenticated user',
         tags: ['auth'],
@@ -123,7 +128,7 @@ export default async function authRoutes(fastify: FastifyInstance) {
   f.post(
     '/auth/logout',
     {
-      preHandler: [fastify.authenticate],
+      onRequest: [fastify.authenticate],
       schema: {
         description: 'Log out the current user and end the session',
         tags: ['auth'],
@@ -142,6 +147,52 @@ export default async function authRoutes(fastify: FastifyInstance) {
 
       reply.clearCookie(SESSION_COOKIE_NAME);
       return reply.status(204).send(null);
+    }
+  );
+
+  // POST /auth/test-login - Development only endpoint for E2E testing
+  f.post(
+    '/auth/test-login',
+    {
+      schema: {
+        description: 'Test login endpoint for E2E testing (development/test only)',
+        tags: ['auth'],
+        body: testLoginBodySchema,
+        response: {
+          200: testLoginResponseSchema,
+          403: errorResponseSchema,
+        },
+      },
+    },
+    async (request, reply) => {
+      // Block in production
+      if (env.NODE_ENV === 'production') {
+        return reply.status(403).send({
+          error: {
+            code: 'FORBIDDEN',
+            message: 'Test login is not available in production',
+          },
+        });
+      }
+
+      const { email, name } = request.body;
+
+      // Create or get test user
+      const user = await handler.createTestUser(email, name);
+
+      // Create session
+      const sessionToken = await handler.createUserSession(user.id);
+
+      // Set session cookie
+      reply.setCookie(SESSION_COOKIE_NAME, sessionToken, {
+        httpOnly: true,
+        secure: false, // Always false for test endpoint
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 60 * 60 * 24 * 30, // 30 days
+      });
+
+      return { data: handler.toUserResponse(user) };
     }
   );
 }

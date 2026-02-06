@@ -4,7 +4,7 @@
 
 ## Reading Order
 
-1. `docs/project/STATUS.md` - **Current state & what to work on next**
+1. `docs/project/project-status.md` - **Current state & what to work on next**
 2. `CLAUDE.md` (project root) - Quick start & conventions
 3. `docs/product/product-spec.md` - What we're building
 4. `docs/engineering/architecture.md` - How it's structured
@@ -36,7 +36,7 @@ Project Plan ([project-plan.md](./project/project-plan.md))
 
 ```
 User: "What's the current status and next task?"
-   ← Claude reads: STATUS.md + project-plan.md
+   ← Claude reads: project-status.md + project-plan.md
    → Claude answers: current position + next task options (milestone/task IDs)
             |
             v
@@ -48,12 +48,12 @@ User: "Work on Task <X>"
             v
 Claude updates progress (during work)
    ← Update: project-plan.md (check off subtasks)
-   ← Update: STATUS.md (in progress / blockers / decisions)
+   ← Update: project-status.md (in progress / blockers / decisions)
    ← Update: changelog.md (when a milestone/feature completes)
             |
             v
 User: "Wrap up this session"
-   ← Claude updates: STATUS.md (next pointer + session log + timestamp)
+   ← Claude updates: project-status.md (next pointer + session log + timestamp)
    ← Claude ensures: project-plan.md reflects reality
             |
             v
@@ -65,7 +65,7 @@ Loop
 
 | Domain                         | Purpose        | Key Documents                                     |
 | ------------------------------ | -------------- | ------------------------------------------------- |
-| [project/](./project/)         | Project state  | **STATUS.md**, project-plan, changelog            |
+| [project/](./project/)         | Project state  | **project-status.md**, project-plan, changelog    |
 | [product/](./product/)         | What to build  | product-spec, user-stories                        |
 | [engineering/](./engineering/) | How it's built | architecture, api-spec, database-schema           |
 | [guidelines/](./guidelines/)   | How to code    | frontend, backend, testing, security              |

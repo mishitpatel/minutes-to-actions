@@ -74,26 +74,24 @@ docker exec -it postgres psql -U postgres -d mydb
 
 ### Run Tests
 ```bash
-# Run all tests
+# All unit tests (recursive across packages)
 pnpm test
 
-# Run tests in watch mode
-pnpm test:watch
+# API E2E tests (tests/api/)
+pnpm test:api                 # Console output (fast, daily driver)
+pnpm test:api:watch           # Watch mode
+pnpm test:api:report          # Console + JSON/JUnit reports in api-test-results/
+pnpm test:api:ui              # Interactive Vitest UI in browser
+pnpm test:api:coverage        # Coverage report (text + HTML in coverage/)
 
-# Run specific test file
-pnpm test user.service.test.ts
-
-# Run tests with coverage
-pnpm test:coverage
-
-# Run tests matching pattern
-pnpm test -t "should create user"
-
-# Run E2E tests
-pnpm test:e2e
-
-# Run E2E in UI mode (Playwright)
-pnpm test:e2e:ui
+# Browser E2E tests (tests/e2e/)
+pnpm test:e2e                 # Chromium only (default)
+pnpm test:e2e:all             # All browsers + mobile
+pnpm test:e2e:firefox         # Firefox only
+pnpm test:e2e:webkit          # Safari/WebKit only
+pnpm test:e2e:mobile          # Mobile Chrome only
+pnpm test:e2e:ui              # Playwright UI mode
+pnpm test:e2e:headed          # Chromium with visible browser
 ```
 
 ### Test Debugging

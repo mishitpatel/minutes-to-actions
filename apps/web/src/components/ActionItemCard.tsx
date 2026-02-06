@@ -99,6 +99,7 @@ export function ActionItemCard({ item, onStatusChange, onClick }: ActionItemCard
       className={`bg-white rounded-lg shadow-sm border p-3 hover:shadow-md transition-shadow cursor-pointer ${
         overdue ? 'border-red-300 bg-red-50' : 'border-gray-200'
       }`}
+      data-testid="action-item-card"
     >
       {/* Header: Title and Mark Done */}
       <div className="flex items-start gap-2 mb-2">

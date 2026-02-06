@@ -111,7 +111,7 @@ export function Sidebar({ onClose }: SidebarProps) {
       {/* User Section */}
       <div className="border-t border-gray-200 p-4">
         {user && (
-          <div className="flex items-center gap-3 mb-3">
+          <div className="flex items-center gap-3 mb-3" data-testid="user-menu">
             {user.avatar_url ? (
               <img
                 src={user.avatar_url}
@@ -137,6 +137,7 @@ export function Sidebar({ onClose }: SidebarProps) {
           onClick={logout}
           disabled={isLoggingOut}
           className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+          data-testid="logout-button"
         >
           <svg
             className="w-4 h-4"

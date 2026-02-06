@@ -55,9 +55,26 @@ export const createdMeetingNoteResponseSchema = z.object({
   data: meetingNoteResponseSchema,
 });
 
+// Extraction response schemas
+export const extractedItemSchema = z.object({
+  title: z.string(),
+  priority: z.enum(['high', 'medium', 'low']),
+  due_date: z.string().nullable(),
+  description: z.string().nullable(),
+});
+
+export const extractionResultSchema = z.object({
+  data: z.object({
+    action_items: z.array(extractedItemSchema),
+    confidence: z.enum(['high', 'medium', 'low']),
+    message: z.string().nullable(),
+  }),
+});
+
 // Inferred types
 export type CreateMeetingNoteInput = z.infer<typeof createMeetingNoteSchema>;
 export type UpdateMeetingNoteInput = z.infer<typeof updateMeetingNoteSchema>;
 export type ListQueryInput = z.infer<typeof listQuerySchema>;
 export type MeetingNoteResponse = z.infer<typeof meetingNoteResponseSchema>;
 export type MeetingNoteWithActions = z.infer<typeof meetingNoteWithActionsSchema>;
+export type ExtractionResult = z.infer<typeof extractionResultSchema>;

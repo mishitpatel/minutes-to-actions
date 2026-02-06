@@ -68,3 +68,9 @@ export function useMeetingNote(id: string) {
     staleTime: 1000 * 60, // 1 minute
   });
 }
+
+export function useExtractActionItems() {
+  return useMutation({
+    mutationFn: (noteId: string) => meetingNotesService.extractActionItems(noteId),
+  });
+}

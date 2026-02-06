@@ -1,14 +1,14 @@
 # Project Status
 
-> Last Updated: 2026-01-28
+> Last Updated: 2026-02-06
 > Updated By: Claude Code
 
 ## Current Position
 
 **Phase:** 1 (MVP)
 **Milestone:** M4 - AI Action-Item Extraction
-**Task:** Task 4.2 - Extraction Endpoint Implementation
-**Status:** Task 4.1 Complete
+**Task:** Task 4.3 - Extraction Review UI
+**Status:** Task 4.3 Complete
 
 → See `project-plan.md` for full task details and subtasks
 
@@ -21,9 +21,9 @@
 ## Session Context
 
 ### Current Task Reference
-- **Location:** `project-plan.md` → Milestone 4 → Task 4.2
-- **Files to modify:** `apps/api/src/modules/meeting-notes/` (add extraction endpoint)
-- **Reference docs:** `docs/engineering/api-spec.md`
+- **Location:** `project-plan.md` → Milestone 4 → Task 4.3
+- **Files to modify:** `apps/web/src/` (services, hooks, components, pages)
+- **Reference docs:** `docs/product/user-stories-phase1.md` (US-3.1, US-3.2, US-3.3)
 
 ### Recent Decisions
 | Date | Decision | Rationale |
@@ -33,6 +33,29 @@
 | 2026-01-20 | devops/ folder | Separate operational from state docs |
 
 ### Session Log
+**2026-02-06 - Task 4.3 Complete (Extraction Review UI)**
+- Created `apps/web/src/components/ExtractionReviewPanel.tsx` - Full extraction workflow UI
+- Added `extractActionItems()` to meeting-notes.service.ts
+- Added `bulkCreate()` to action-items.service.ts
+- Added `useExtractActionItems()` hook to useMeetingNotes.ts
+- Added `useBulkCreateActionItems()` hook to useActionItems.ts
+- Replaced disabled placeholder in NoteDetailPage with ExtractionReviewPanel
+- States: idle, extracting (spinner), review (edit/toggle/remove items), empty result (US-3.2), error with retry (US-3.3), saving, success
+- Review features: checkbox include/exclude, inline title editing, priority dropdown, due date picker, remove button
+- Confidence badge display, selected count, bulk save to board as "todo" status
+- 100 API tests still passing, TypeScript compiles clean
+- Closed GitHub issue #25
+- **Next: Task 4.4 or next milestone task**
+
+**2026-02-06 - Task 4.2 Complete (Extraction Endpoint)**
+- Implemented `POST /meeting-notes/:id/extract` endpoint with full schema validation
+- Added extraction schemas (extractedItemSchema, extractionResultSchema)
+- Handler calls Claude service, wraps in standard response format
+- Error handling: 404 (note not found), 422 (empty body), 429 (rate limit), 502 (extraction failure)
+- 100 API E2E tests passing across all modules
+- Closed GitHub issue #24
+- **Next: Start Task 4.3 - Extraction Review UI**
+
 **2026-01-28 - Task 4.1 Complete (Claude API Integration)**
 - Created `apps/api/src/services/claude.ts` - Claude API client with extractActionItems() function
 - Added `ANTHROPIC_API_KEY` environment variable to env.ts and .env.example
@@ -178,7 +201,7 @@
 **2026-01-20 - Documentation Restructure**
 - Created devops/ folder with commands, github-workflow, ci-cd, troubleshooting
 - Updated all cross-references
-- Revised STATUS.md to be a lightweight pointer (no duplicate task lists)
+- Revised project-status.md to be a lightweight pointer (no duplicate task lists)
 - Next: Start M2 Task 2.1
 
 ---
@@ -192,7 +215,7 @@
 ## Session Workflow
 
 ### Starting a Session
-1. Read this file (STATUS.md) for current position
+1. Read this file (project-status.md) for current position
 2. Find the current task in `project-plan.md`
 3. Check blockers before starting
 4. Update Active Task status to "In Progress"

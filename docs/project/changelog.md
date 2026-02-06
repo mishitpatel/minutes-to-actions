@@ -49,6 +49,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Optimistic updates for drag-and-drop with rollback on error
 - Keyboard navigation support for drag-and-drop
 - Source note navigation from action items (Task 3.8) - links to source note, "Note deleted" for orphaned items, hidden for manual items
+- Claude API integration for action item extraction (Task 4.1) - claude.ts service with extractActionItems()
+- ExtractionError and RateLimitError custom error classes
+- Extraction endpoint `POST /meeting-notes/:id/extract` (Task 4.2) with schema validation and error handling
+- Extraction Review UI (Task 4.3) - ExtractionReviewPanel component with extract, review, edit, and save workflow
+- `extractActionItems()` method in meeting-notes service
+- `bulkCreate()` method in action-items service
+- `useExtractActionItems()` and `useBulkCreateActionItems()` React Query hooks
 
 ### Changed
 - Reformatted CLAUDE.md "First Time Setup" section for consistency
@@ -121,6 +128,6 @@ When making changes:
 
 ## Related Documents
 
-- Project Status: `docs/project/STATUS.md`
+- Project Status: `docs/project/project-status.md`
 - Milestones: `docs/project/milestones/`
 - GitHub Workflow: `docs/devops/github-workflow.md`

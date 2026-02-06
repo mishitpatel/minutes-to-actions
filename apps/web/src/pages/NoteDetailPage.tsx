@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useMeetingNote, useMeetingNotes } from '../hooks/useMeetingNotes';
 import { NoteEditor, type NoteEditorData } from '../components/NoteEditor';
 import { ConfirmDialog } from '../components/ConfirmDialog';
+import { ExtractionReviewPanel } from '../components/ExtractionReviewPanel';
 
 function formatDate(dateString: string): string {
   const date = new Date(dateString);
@@ -253,37 +254,7 @@ export function NoteDetailPage() {
           </div>
         </div>
 
-        <div className="border-t border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Action Items</h3>
-          <div className="bg-gray-50 rounded-lg p-6 text-center">
-            <svg
-              className="w-12 h-12 text-gray-400 mx-auto mb-3"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={1.5}
-                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
-              />
-            </svg>
-            <p className="text-gray-600 mb-4">
-              No action items extracted from this note yet.
-            </p>
-            <button
-              disabled
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg opacity-50 cursor-not-allowed"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-              Extract Action Items
-              <span className="text-xs bg-blue-500 px-2 py-0.5 rounded-full">Coming Soon</span>
-            </button>
-          </div>
-        </div>
+        <ExtractionReviewPanel noteId={id!} />
       </div>
 
       <ConfirmDialog

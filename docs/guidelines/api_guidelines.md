@@ -264,58 +264,12 @@ X-RateLimit-Reset: 1704153600
 | Authenticated | 100 req/min |
 | Admin         | 500 req/min |
 
-## API Endpoints Reference
+## API Reference
 
-### Auth Module
-```yaml
-POST   /auth/register     # Register new user
-POST   /auth/login        # Login user
-POST   /auth/logout       # Logout user
-POST   /auth/refresh      # Refresh access token
-POST   /auth/forgot-password
-POST   /auth/reset-password
-```
-
-### Users Module
-```yaml
-GET    /users             # List users (admin)
-GET    /users/:id         # Get user by ID
-POST   /users             # Create user (admin)
-PATCH  /users/:id         # Update user
-DELETE /users/:id         # Delete user (admin)
-GET    /users/me          # Get current user
-PATCH  /users/me          # Update current user
-```
-
-## OpenAPI Specification
-
-> OpenAPI spec is auto-generated from Zod schemas at runtime (no static YAML file)
-
-### Example Schema
-```yaml
-components:
-  schemas:
-    User:
-      type: object
-      required:
-        - id
-        - email
-        - name
-      properties:
-        id:
-          type: string
-          format: uuid
-        email:
-          type: string
-          format: email
-        name:
-          type: string
-          minLength: 1
-          maxLength: 100
-        created_at:
-          type: string
-          format: date-time
-```
+For actual endpoints, request/response schemas, and behavior rules, see:
+- `docs/engineering/api-spec.md` — Full endpoint documentation
+- `http://localhost:3000/docs` — Interactive API explorer (Scalar)
+- `apps/api/src/modules/[mod]/[mod].schemas.ts` — Zod schema source of truth
 
 ## Interactive API Documentation
 

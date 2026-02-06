@@ -1,5 +1,6 @@
 import { prisma } from '../../lib/prisma.js';
 import { NotFoundError } from '../../utils/errors.js';
+import { extractActionItems } from '../../services/claude.js';
 import type { CreateMeetingNoteInput, UpdateMeetingNoteInput, MeetingNoteResponse, MeetingNoteWithActions } from './meeting-notes.schemas.js';
 
 // Response transformer
@@ -149,4 +150,17 @@ export async function deleteMeetingNote(id: string, userId: string): Promise<voi
 
   // Delete the note (action items become orphaned via SET NULL)
   await prisma.meetingNote.delete({ where: { id } });
+}
+
+export async function extractActionItemsFromNote(noteId: string, userId: string) {
+  const note = await getMeetingNoteById(noteId, userId);
+  const result = await extractActionItems(note.body);
+
+  return {
+    action_items: result.action_items,
+    confidence: result.confidence,
+    message: result.action_items.length === 0
+      ? 'No action items found in this meeting note.'
+      : null,
+  };
 }

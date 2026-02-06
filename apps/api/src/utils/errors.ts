@@ -39,3 +39,15 @@ export class ConflictError extends AppError {
     super(message, 409, 'CONFLICT');
   }
 }
+
+export class ExtractionError extends AppError {
+  constructor(message = 'Failed to extract action items') {
+    super(message, 500, 'EXTRACTION_FAILED');
+  }
+}
+
+export class RateLimitError extends AppError {
+  constructor(message = 'Rate limit exceeded') {
+    super(message, 429, 'RATE_LIMITED');
+  }
+}

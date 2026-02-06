@@ -30,6 +30,7 @@ pnpm-debug.log*
 # Testing
 coverage/
 .nyc_output/
+api-test-results/
 
 # Prisma
 apps/api/prisma/*.db

@@ -2,8 +2,6 @@ import 'dotenv/config';
 import Fastify, { FastifyInstance, FastifyError, FastifyRequest, FastifyReply } from 'fastify';
 import cors from '@fastify/cors';
 import cookie from '@fastify/cookie';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import helmet from '@fastify/helmet';
 import rateLimit from '@fastify/rate-limit';
 import swagger from '@fastify/swagger';
 import scalarApiReference from '@scalar/fastify-api-reference';

@@ -30,8 +30,25 @@ export interface UpdateNoteData {
   body?: string;
 }
 
+export interface ExtractedItem {
+  title: string;
+  priority: 'high' | 'medium' | 'low';
+  due_date: string | null;
+  description: string | null;
+}
+
+export interface ExtractionResult {
+  action_items: ExtractedItem[];
+  confidence: 'high' | 'medium' | 'low';
+  message: string | null;
+}
+
 interface SingleNoteResponse {
   data: MeetingNote;
+}
+
+interface ExtractionResponse {
+  data: ExtractionResult;
 }
 
 export const meetingNotesService = {
@@ -58,5 +75,10 @@ export const meetingNotesService = {
 
   async delete(id: string): Promise<void> {
     await api.delete(`/meeting-notes/${id}`);
+  },
+
+  async extractActionItems(id: string): Promise<ExtractionResult> {
+    const response = await api.post<ExtractionResponse>(`/meeting-notes/${id}/extract`);
+    return response.data;
   },
 };

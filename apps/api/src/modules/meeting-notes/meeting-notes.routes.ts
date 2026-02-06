@@ -11,6 +11,7 @@ import {
   singleMeetingNoteResponseSchema,
   createdMeetingNoteResponseSchema,
   meetingNoteResponseSchema,
+  extractionResultSchema,
 } from './meeting-notes.schemas.js';
 import * as handler from './meeting-notes.handler.js';
 
@@ -21,7 +22,7 @@ export default async function meetingNotesRoutes(fastify: FastifyInstance) {
   f.get(
     '/meeting-notes',
     {
-      preHandler: [fastify.authenticate],
+      onRequest: [fastify.authenticate],
       schema: {
         description: 'List all meeting notes with pagination',
         tags: ['meeting-notes'],
@@ -44,7 +45,7 @@ export default async function meetingNotesRoutes(fastify: FastifyInstance) {
   f.get(
     '/meeting-notes/:id',
     {
-      preHandler: [fastify.authenticate],
+      onRequest: [fastify.authenticate],
       schema: {
         description: 'Get a single meeting note by ID with its action items',
         tags: ['meeting-notes'],
@@ -69,7 +70,7 @@ export default async function meetingNotesRoutes(fastify: FastifyInstance) {
   f.post(
     '/meeting-notes',
     {
-      preHandler: [fastify.authenticate],
+      onRequest: [fastify.authenticate],
       schema: {
         description: 'Create a new meeting note',
         tags: ['meeting-notes'],
@@ -93,7 +94,7 @@ export default async function meetingNotesRoutes(fastify: FastifyInstance) {
   f.put(
     '/meeting-notes/:id',
     {
-      preHandler: [fastify.authenticate],
+      onRequest: [fastify.authenticate],
       schema: {
         description: 'Update an existing meeting note',
         tags: ['meeting-notes'],
@@ -120,7 +121,7 @@ export default async function meetingNotesRoutes(fastify: FastifyInstance) {
   f.delete(
     '/meeting-notes/:id',
     {
-      preHandler: [fastify.authenticate],
+      onRequest: [fastify.authenticate],
       schema: {
         description: 'Delete a meeting note',
         tags: ['meeting-notes'],
@@ -138,6 +139,33 @@ export default async function meetingNotesRoutes(fastify: FastifyInstance) {
 
       await handler.deleteMeetingNote(id, userId);
       return reply.status(204).send(null);
+    }
+  );
+
+  // POST /meeting-notes/:id/extract - Extract action items from meeting note
+  f.post(
+    '/meeting-notes/:id/extract',
+    {
+      onRequest: [fastify.authenticate],
+      schema: {
+        description: 'Extract action items from a meeting note using AI',
+        tags: ['meeting-notes'],
+        params: idParamSchema,
+        response: {
+          200: extractionResultSchema,
+          401: errorResponseSchema,
+          404: errorResponseSchema,
+          429: errorResponseSchema,
+          500: errorResponseSchema,
+        },
+      },
+    },
+    async (request) => {
+      const { id } = request.params;
+      const userId = request.user!.id;
+
+      const result = await handler.extractActionItemsFromNote(id, userId);
+      return { data: result };
     }
   );
 }

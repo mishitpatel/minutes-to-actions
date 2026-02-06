@@ -104,3 +104,47 @@ export async function createUserSession(userId: string): Promise<string> {
 export async function deleteUserSession(token: string): Promise<void> {
   await deleteSession(token);
 }
+
+/**
+ * Create or update a test user (development/test only)
+ * Uses a deterministic fake googleId to avoid conflicts with real OAuth users
+ */
+export async function createTestUser(email: string, name: string) {
+  const testGoogleId = `test-user-${email}`;
+
+  // First check if user exists by email
+  const existingByEmail = await prisma.user.findUnique({
+    where: { email },
+  });
+
+  if (existingByEmail) {
+    // If user exists with this email, update their name and return
+    return prisma.user.update({
+      where: { email },
+      data: { name },
+    });
+  }
+
+  // Check if test user exists by googleId
+  const existingByGoogleId = await prisma.user.findUnique({
+    where: { googleId: testGoogleId },
+  });
+
+  if (existingByGoogleId) {
+    // Update existing test user
+    return prisma.user.update({
+      where: { googleId: testGoogleId },
+      data: { email, name },
+    });
+  }
+
+  // Create new test user
+  return prisma.user.create({
+    data: {
+      googleId: testGoogleId,
+      email,
+      name,
+      avatarUrl: null,
+    },
+  });
+}

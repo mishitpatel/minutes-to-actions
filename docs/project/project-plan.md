@@ -398,17 +398,17 @@
 
 ---
 
-### Task 4.1: Claude API Integration
+### Task 4.1: Claude API Integration ✅
 
 **Description:** Set up Claude/Anthropic API client for action item extraction.
 
 **Subtasks:**
-- [ ] Add `ANTHROPIC_API_KEY` environment variable
-- [ ] Install Anthropic SDK (`@anthropic-ai/sdk`)
-- [ ] Create Claude service/utility module
-- [ ] Design prompt for action item extraction
-- [ ] Test prompt with various meeting note samples
-- [ ] Handle API rate limits and errors
+- [x] Add `ANTHROPIC_API_KEY` environment variable
+- [x] Install Anthropic SDK (`@anthropic-ai/sdk`)
+- [x] Create Claude service/utility module
+- [x] Design prompt for action item extraction
+- [x] Test prompt with various meeting note samples
+- [x] Handle API rate limits and errors
 
 ---
 

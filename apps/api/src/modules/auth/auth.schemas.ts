@@ -35,8 +35,19 @@ export const meResponseSchema = z.object({
   data: userResponseSchema,
 });
 
+// Test login schemas (development/test only)
+export const testLoginBodySchema = z.object({
+  email: z.string().email(),
+  name: z.string().min(1),
+});
+
+export const testLoginResponseSchema = z.object({
+  data: userResponseSchema,
+});
+
 // Inferred types
 export type GoogleUser = z.infer<typeof googleUserSchema>;
 export type GoogleToken = z.infer<typeof googleTokenSchema>;
 export type CallbackQuery = z.infer<typeof callbackQuerySchema>;
 export type UserResponse = z.infer<typeof userResponseSchema>;
+export type TestLoginBody = z.infer<typeof testLoginBodySchema>;

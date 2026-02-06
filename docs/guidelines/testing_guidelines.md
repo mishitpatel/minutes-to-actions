@@ -1,31 +1,38 @@
-# Testing Guidelines
+Also, why did you remove# Testing Guidelines
 
-> **Last Updated:** YYYY-MM-DD
-> **Test Runner:** Vitest
+> **Last Updated:** 2026-02-04
+> **Test Runners:** Vitest (unit/API), Playwright (browser E2E)
 > **Coverage Target:** 80% for critical paths
 
 ## Coverage Requirements
 
-| Type | Minimum |
-|------|---------|
-| Unit Tests | 80% |
-| Integration Tests | Key flows covered |
-| E2E Tests | Critical paths |
+| Type                | Minimum           |
+| ------------------- | ----------------- |
+| Unit Tests          | 80%               |
+| API E2E Tests       | Key flows covered |
+| Browser E2E Tests   | Critical paths    |
 
 ## Testing Philosophy
 
 ### Test Pyramid
+
 ```
         ╱╲
-       ╱  ╲         E2E Tests (few)
-      ╱────╲        - Critical user flows
-     ╱      ╲       - Smoke tests
-    ╱────────╲      Integration Tests (some)
-   ╱          ╲     - API endpoints
-  ╱────────────╲    - Database operations
+       ╱  ╲         Browser E2E Tests (few)
+      ╱────╲        - Critical user flows via Playwright
+     ╱      ╲       - Full stack: browser → API → database
+    ╱────────╲      API E2E Tests (some)
+   ╱          ╲     - Vitest + Fastify inject()
+  ╱────────────╲    - Full API stack: Fastify → database
  ╱              ╲   Unit Tests (many)
-╱────────────────╲  - Functions, components
+╱────────────────╲  - Functions, components, handlers
 ```
+
+| Level | Tool | Location | Purpose |
+|-------|------|----------|---------|
+| Browser E2E | Playwright | `tests/e2e/` | Full user flows in real browser |
+| API E2E | Vitest + Fastify inject() | `tests/api/` | API endpoints with real database |
+| Unit | Vitest | Co-located with source | Isolated function/component tests |
 
 ### What to Test
 - ✅ Business logic
@@ -43,33 +50,57 @@
 ## Test Structure
 
 ### File Organization
+
 ```
+tests/
+├── api/                           # API E2E tests (Vitest + Fastify inject)
+│   ├── setup.ts                   # App setup, helpers, test context
+│   ├── factories.ts               # Test data factories
+│   ├── auth.test.ts
+│   ├── meeting-notes.test.ts
+│   └── action-items.test.ts
+├── e2e/                           # Browser E2E tests (Playwright)
+│   ├── fixtures/
+│   │   ├── auth.fixture.ts        # Authentication fixture
+│   │   └── pages/                 # Page Object Models
+│   │       ├── base.page.ts
+│   │       ├── login.page.ts
+│   │       ├── board.page.ts
+│   │       └── notes.page.ts
+│   ├── auth.setup.ts              # Auth state setup
+│   ├── auth.spec.ts
+│   ├── meeting-notes.spec.ts
+│   └── kanban-board.spec.ts
+├── vitest.config.ts               # Vitest config for API tests
+└── tsconfig.json
+
 apps/
-├── web/src/
-│   ├── components/
-│   │   └── Button/
-│   │       ├── Button.tsx
-│   │       └── Button.test.tsx     # Co-located tests
-│   └── __tests__/
-│       └── integration/            # Integration tests
-│
-└── api/src/
-    ├── modules/
-    │   └── user/
-    │       ├── user.service.ts
-    │       ├── user.service.test.ts
-    │       └── user.routes.test.ts
-    └── __tests__/
-        └── e2e/                    # E2E tests
+├── api/src/modules/
+│   └── [feature]/
+│       ├── [feature].handler.ts
+│       └── [feature].test.ts      # Unit tests (co-located)
+└── web/src/
+    └── components/
+        ├── Button.tsx
+        └── Button.test.tsx         # Unit tests (co-located)
 ```
 
 ### Naming Conventions
+
 ```typescript
-// Files
-Button.test.tsx           // Unit tests
-user.service.test.ts
-user.routes.test.ts       // Integration tests
-auth.e2e.test.ts          // E2E tests
+// API E2E tests (tests/api/)
+auth.test.ts
+meeting-notes.test.ts
+action-items.test.ts
+
+// Browser E2E tests (tests/e2e/)
+auth.spec.ts
+meeting-notes.spec.ts
+kanban-board.spec.ts
+
+// Unit tests (co-located)
+Button.test.tsx
+user.handler.test.ts
 
 // Test descriptions
 describe('UserService', () => {
@@ -302,112 +333,195 @@ describe('Sidebar', () => {
 });
 ```
 
-## API Integration Testing
+## API E2E Testing
 
-### Setup with Supertest
+API E2E tests run against the full Fastify + PostgreSQL stack using Vitest and Fastify's inject method.
+
+**Location:** `tests/api/`
+
+### Setup Utilities
+
+All API tests use shared utilities from `tests/api/setup.ts`:
+
 ```typescript
-import request from 'supertest';
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
-import { app } from '@/app';
-import { prisma } from '@/config/database';
+import {
+  setupApp,
+  teardownApp,
+  cleanupDatabase,
+  createTestContext,
+  makeRequest,
+  parseBody,
+} from './setup.js';
 
-describe('User API', () => {
-  let authToken: string;
-
+describe('Feature API E2E', () => {
   beforeAll(async () => {
-    // Setup test database
-    await prisma.$connect();
-    authToken = await createTestUser();
+    await setupApp();  // Initialize Fastify app
   });
 
   afterAll(async () => {
-    // Cleanup
-    await prisma.user.deleteMany();
-    await prisma.$disconnect();
+    await teardownApp();  // Close app and disconnect DB
   });
 
-  describe('GET /api/users', () => {
-    it('returns 401 without auth', async () => {
-      const response = await request(app).get('/api/users');
-      expect(response.status).toBe(401);
-    });
-
-    it('returns users list', async () => {
-      const response = await request(app)
-        .get('/api/users')
-        .set('Authorization', `Bearer ${authToken}`);
-
-      expect(response.status).toBe(200);
-      expect(response.body.data).toBeInstanceOf(Array);
-    });
+  beforeEach(async () => {
+    await cleanupDatabase();  // Clear all test data
   });
 
-  describe('POST /api/users', () => {
-    it('creates user with valid data', async () => {
-      const response = await request(app)
-        .post('/api/users')
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({
-          email: 'new@example.com',
-          name: 'New User',
-          password: 'password123',
-        });
-
-      expect(response.status).toBe(201);
-      expect(response.body.data).toMatchObject({
-        email: 'new@example.com',
-        name: 'New User',
-      });
+  it('should return 401 when not authenticated', async () => {
+    const response = await makeRequest({
+      method: 'GET',
+      url: '/api/v1/protected-resource',
     });
 
-    it('returns 422 for invalid email', async () => {
-      const response = await request(app)
-        .post('/api/users')
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({
-          email: 'invalid',
-          name: 'Test',
-          password: 'password123',
-        });
+    expect(response.statusCode).toBe(401);
+    const body = parseBody<{ error: { code: string } }>(response);
+    expect(body.error.code).toBe('UNAUTHORIZED');
+  });
 
-      expect(response.status).toBe(422);
-      expect(response.body.error.code).toBe('VALIDATION_ERROR');
+  it('should return resources for authenticated user', async () => {
+    const { sessionToken } = await createTestContext();
+
+    const response = await makeRequest({
+      method: 'GET',
+      url: '/api/v1/resources',
+      sessionToken,
     });
+
+    expect(response.statusCode).toBe(200);
+    const body = parseBody<{ data: unknown[] }>(response);
+    expect(body.data).toBeDefined();
   });
 });
 ```
 
-## E2E Testing
+### Test Factories
 
-### Setup with Playwright
+Use factories from `tests/api/factories.ts` for creating test data:
+
 ```typescript
-// e2e/auth.spec.ts
+import { createUser, createMeetingNote, createActionItem } from './factories.js';
+
+// Create user with session
+const { user, sessionToken } = await createTestContext();
+
+// Create related data
+const note = await createMeetingNote(user.id, { title: 'Test Note' });
+const item = await createActionItem(user.id, { status: 'todo' });
+```
+
+### Required Test Cases
+
+For each API endpoint, include tests for:
+
+- **401 Unauthorized** - Request without session token
+- **400 Bad Request** - Missing/invalid required fields
+- **404 Not Found** - Non-existent resource
+- **200/201 Success** - Happy path
+- **User isolation** - Cannot access other users' data
+
+> **Detailed Reference:** For error conventions, test patterns, and Claude Code
+> generation instructions, see `docs/guidelines/api_testing_guidelines.md`.
+
+## Browser E2E Testing
+
+Browser E2E tests use Playwright to test full user flows in a real browser.
+
+**Location:** `tests/e2e/`
+
+### Page Object Model
+
+All E2E tests use Page Objects for maintainability. Page Objects are located in `tests/e2e/fixtures/pages/`.
+
+```typescript
+// tests/e2e/fixtures/pages/feature.page.ts
+import { Page, Locator, expect } from '@playwright/test';
+import { BasePage } from './base.page.js';
+
+export class FeaturePage extends BasePage {
+  constructor(page: Page) {
+    super(page);
+  }
+
+  // Navigation
+  async goto(): Promise<void> {
+    await this.page.goto('/feature');
+  }
+
+  async waitForReady(): Promise<void> {
+    await expect(this.mainContent).toBeVisible();
+  }
+
+  // Locators (prefer data-testid > role > text)
+  get mainContent(): Locator {
+    return this.page.getByTestId('feature-content');
+  }
+
+  get createButton(): Locator {
+    return this.page.getByRole('button', { name: /create/i });
+  }
+
+  // Actions
+  async createItem(name: string): Promise<void> {
+    await this.createButton.click();
+    await this.page.getByLabel('Name').fill(name);
+    await this.page.getByRole('button', { name: 'Save' }).click();
+  }
+
+  // Assertions
+  async expectItemVisible(name: string): Promise<void> {
+    await expect(this.getItemByName(name)).toBeVisible();
+  }
+}
+```
+
+### Test Structure
+
+```typescript
+// tests/e2e/feature.spec.ts
+import { test, expect } from './fixtures/auth.fixture.js';
+import { FeaturePage } from './fixtures/pages/feature.page.js';
+
+test.describe('Feature Name', () => {
+  let featurePage: FeaturePage;
+
+  test.beforeEach(async ({ authenticatedPage }) => {
+    featurePage = new FeaturePage(authenticatedPage);
+    await featurePage.goto();
+    await featurePage.waitForReady();
+  });
+
+  test('should create an item', async () => {
+    await featurePage.createItem('New Item');
+    await featurePage.expectItemVisible('New Item');
+  });
+});
+```
+
+### Authentication Fixture
+
+Use the auth fixture for tests that require a logged-in user:
+
+```typescript
+// Unauthenticated test
 import { test, expect } from '@playwright/test';
 
-test.describe('Authentication', () => {
-  test('user can login', async ({ page }) => {
-    await page.goto('/login');
-    
-    await page.fill('[name="email"]', 'user@example.com');
-    await page.fill('[name="password"]', 'password123');
-    await page.click('button[type="submit"]');
-    
-    await expect(page).toHaveURL('/dashboard');
-    await expect(page.locator('h1')).toContainText('Welcome');
-  });
+// Authenticated test
+import { test, expect } from './fixtures/auth.fixture.js';
 
-  test('shows error for invalid credentials', async ({ page }) => {
-    await page.goto('/login');
-    
-    await page.fill('[name="email"]', 'wrong@example.com');
-    await page.fill('[name="password"]', 'wrongpassword');
-    await page.click('button[type="submit"]');
-    
-    await expect(page.locator('[role="alert"]'))
-      .toContainText('Invalid credentials');
-  });
+test('should show user menu', async ({ authenticatedPage }) => {
+  // authenticatedPage is already logged in
 });
 ```
+
+### Selector Strategy
+
+Prefer selectors in this order (most stable to least):
+
+1. **Test IDs**: `page.getByTestId('submit-button')`
+2. **ARIA Roles**: `page.getByRole('button', { name: 'Submit' })`
+3. **Labels**: `page.getByLabel('Email')`
+4. **Placeholder**: `page.getByPlaceholder('Enter email')`
+5. **Text**: `page.getByText('Welcome')` (least stable)
 
 ## Mock Service Worker (MSW)
 
@@ -532,7 +646,7 @@ export default defineConfig({
 ### Running Coverage
 ```bash
 # Generate coverage report
-pnpm test:coverage
+pnpm test:api:coverage
 
 # View HTML report
 open coverage/index.html
@@ -541,23 +655,59 @@ open coverage/index.html
 ## Testing Commands
 
 ```bash
-# Run all tests
-pnpm test
+# Unit tests (all packages)
+pnpm test                     # Run all unit tests
+pnpm test:watch               # Watch mode
 
-# Run in watch mode
-pnpm test:watch
+# API E2E tests (tests/api/)
+pnpm test:api                 # Run API E2E tests
+pnpm test:api:watch           # Watch mode
+pnpm test:api:report          # Console + JSON/JUnit reports in api-test-results/
+pnpm test:api:ui              # Interactive Vitest UI in browser
+pnpm test:api:coverage        # Coverage report (text + HTML in coverage/)
 
-# Run specific file
-pnpm test user.service.test.ts
+# Browser E2E tests (tests/e2e/)
+pnpm test:e2e                 # Chromium only (default, fast)
+pnpm test:e2e:all             # All browsers + mobile
+pnpm test:e2e:firefox         # Firefox only
+pnpm test:e2e:webkit          # Safari/WebKit only
+pnpm test:e2e:mobile          # Mobile Chrome only
+pnpm test:e2e:ui              # Chromium in UI mode (great for debugging)
+pnpm test:e2e:headed          # Chromium with visible browser
 
-# Run with coverage
-pnpm test:coverage
+# Custom browser combinations
+npx playwright test --project=chromium --project=firefox
 
-# Run E2E tests
-pnpm test:e2e
+# Coverage
+pnpm test:api:coverage        # Generate coverage report
+```
 
-# Run E2E in UI mode
-pnpm test:e2e:ui
+### Browser Testing Strategy
+
+| Command | Browsers | Use Case |
+|---------|----------|----------|
+| `pnpm test:e2e` | Chromium | Default for fast development feedback |
+| `pnpm test:e2e:all` | All (5 projects) | Pre-release cross-browser verification |
+| `pnpm test:e2e:firefox` | Firefox | Firefox-specific debugging |
+| `pnpm test:e2e:webkit` | WebKit/Safari | Safari-specific debugging |
+| `pnpm test:e2e:mobile` | Mobile Chrome | Mobile viewport testing |
+
+**CI/CD behavior:**
+- PR builds run Chromium only for fast feedback
+- Manual workflow dispatch allows selecting specific browsers
+- Pre-release testing should use `test:e2e:all`
+
+### Running Specific Tests
+
+```bash
+# Specific API test file
+pnpm test:api tests/api/auth.test.ts
+
+# Specific E2E test file
+pnpm test:e2e tests/e2e/auth.spec.ts
+
+# Specific test by name
+pnpm test:e2e -g "should login"
 ```
 
 ## Best Practices Checklist
@@ -603,8 +753,123 @@ Before marking a feature complete, verify:
 - [ ] Auth/permissions work correctly
 - [ ] Input validation prevents malicious data
 
+## Test Generation with Claude Skills
+
+Claude can assist with generating tests using specialized skills. Tests should be **suggested**, not auto-generated.
+
+### Available Skills
+
+| Skill | Command | Purpose |
+|-------|---------|---------|
+| API Test Generator | `/api-test-generator [module]` | Generate Vitest + Fastify inject tests for API endpoints |
+| E2E Test Generator | `/e2e-test-generator [flow]` | Generate Playwright tests for user flows |
+
+### When to Generate Tests
+
+- After creating/modifying API endpoints → Suggest API E2E tests
+- After creating/modifying UI features → Suggest Browser E2E tests
+- After fixing bugs → Suggest regression tests
+
+### Example Workflow
+
+```
+User: "I just finished the action items API"
+
+Claude: "I've completed the action items API. Would you like me to generate:
+- API E2E tests for the action-items endpoints?"
+
+User: "Yes"
+
+Claude: /api-test-generator action-items
+```
+
+### Skill Documentation
+
+For detailed patterns and examples, see:
+- `.claude/skills/api-test-generator.md` - API test patterns
+- `.claude/skills/e2e-test-generator.md` - E2E test patterns
+
+## Spec-Driven Test Development
+
+### Contract-First Testing
+
+Tests MUST be derived from specifications, not assumptions. This prevents common errors like:
+- Using wrong HTTP methods (PATCH vs PUT)
+- Testing fields not in current phase scope (e.g., assignee in Phase 1)
+- Missing acceptance criteria coverage
+
+### Workflow
+
+Before writing any test:
+
+1. **User Story First**: Identify the user story (US-X.X)
+2. **Scope Check**: Verify features are in Phase 1
+3. **API Contract**: Use HTTP methods from api-spec.md
+4. **Data Model**: Use only fields from database-schema.md
+
+### Quick Reference
+
+| Spec | What to Check |
+|------|---------------|
+| `docs/product/product-spec.md` | Is this feature in Phase 1? |
+| `docs/product/user-stories-phase1.md` | What are the acceptance criteria? |
+| `docs/engineering/api-spec.md` | What HTTP method? PUT or PATCH? |
+| `docs/engineering/database-schema.md` | What columns exist? |
+
+### Phase 1 Scope Reference
+
+**Action Item Fields (Phase 1):**
+- title, description, priority, due_date, status
+
+**NOT in Phase 1:**
+- assignee (Phase 3)
+- File attachments
+- Comments/threads
+
+### HTTP Methods Reference
+
+| Operation | Method | Common Mistake |
+|-----------|--------|----------------|
+| Full resource update | PUT | Using PATCH |
+| Single field update | PATCH | Using PUT |
+| Create new resource | POST | |
+| Delete resource | DELETE | |
+
+### Anti-Patterns
+
+Avoid these common mistakes:
+
+| Anti-Pattern | Problem | Solution |
+|--------------|---------|----------|
+| Assumption-based tests | Tests fail due to incorrect assumptions | Read specs first |
+| Testing future features | Tests include Phase 2/3 fields | Check product-spec.md |
+| Wrong HTTP methods | Using PATCH for full updates | Check api-spec.md |
+| Missing acceptance criteria | Incomplete test coverage | Map all AC to test cases |
+
+### Test File Header Template
+
+Every test file should include a header documenting spec sources:
+
+```typescript
+/**
+ * Tests for US-X.X: [User Story Title]
+ *
+ * Acceptance Criteria (from user-stories-phase1.md):
+ * - AC1: [criterion]
+ * - AC2: [criterion]
+ *
+ * Phase 1 Scope (from product-spec.md):
+ * - Fields: [available fields]
+ * - NOT in Phase 1: [excluded fields]
+ *
+ * API Contract (from api-spec.md):
+ * - [METHOD] [endpoint]: [description]
+ */
+```
+
 ## Related Documents
 
 - Frontend Guidelines: `docs/guidelines/frontend_guidelines.md`
 - Backend Guidelines: `docs/guidelines/backend_guidelines.md`
 - API Design: `docs/engineering/api-spec.md`
+- Test Generation (CLAUDE.md): `CLAUDE.md#test-generation-suggested-mode`

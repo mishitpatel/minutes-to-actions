@@ -5,6 +5,7 @@ import {
   type CreateActionItemData,
   type UpdateActionItemData,
   type GroupedActionItems,
+  type BulkCreateData,
 } from '../services/action-items.service';
 
 export const ACTION_ITEMS_QUERY_KEY = ['action-items'];
@@ -79,6 +80,16 @@ export function useActionItem(id: string) {
     queryFn: () => actionItemsService.get(id),
     enabled: !!id,
     staleTime: 1000 * 60, // 1 minute
+  });
+}
+
+export function useBulkCreateActionItems() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: BulkCreateData) => actionItemsService.bulkCreate(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ACTION_ITEMS_QUERY_KEY });
+    },
   });
 }
 

@@ -49,6 +49,26 @@ export interface UpdateActionItemData {
   due_date?: string | null;
 }
 
+export interface BulkCreateData {
+  meeting_note_id: string;
+  items: {
+    title: string;
+    description?: string | null;
+    priority?: Priority;
+    status?: Status;
+    due_date?: string | null;
+  }[];
+}
+
+export interface BulkCreateResult {
+  created_count: number;
+  items: ActionItem[];
+}
+
+interface BulkCreateResponse {
+  data: BulkCreateResult;
+}
+
 interface GroupedResponse {
   data: GroupedActionItems;
 }
@@ -78,7 +98,7 @@ export const actionItemsService = {
   },
 
   async update(id: string, data: UpdateActionItemData): Promise<ActionItem> {
-    const response = await api.patch<CreatedResponse>(`/action-items/${id}`, data);
+    const response = await api.put<CreatedResponse>(`/action-items/${id}`, data);
     return response.data;
   },
 
@@ -100,6 +120,11 @@ export const actionItemsService = {
     // First update status, then position
     await api.patch<CreatedResponse>(`/action-items/${id}/status`, { status });
     const response = await api.patch<CreatedResponse>(`/action-items/${id}/position`, { position });
+    return response.data;
+  },
+
+  async bulkCreate(data: BulkCreateData): Promise<BulkCreateResult> {
+    const response = await api.post<BulkCreateResponse>('/action-items/bulk', data);
     return response.data;
   },
 };

@@ -46,6 +46,12 @@ export async function createApp(options: AppOptions = {}): Promise<FastifyInstan
       });
     }
 
+    if (error.code?.startsWith('FST_ERR_CTP_')) {
+      return reply.status(400).send({
+        error: { code: 'BAD_REQUEST', message: 'Invalid request body' },
+      });
+    }
+
     return reply.status(500).send({
       error: { code: 'INTERNAL_ERROR', message: 'An unexpected error occurred' },
     });

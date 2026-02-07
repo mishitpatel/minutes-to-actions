@@ -5,6 +5,17 @@ import dotenv from 'dotenv';
 // Load .env from project root
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
+// Override DATABASE_URL with test database so tests don't wipe dev data
+const testDbUrl =
+  process.env.DATABASE_URL_TEST ||
+  process.env.DATABASE_URL?.replace(
+    '/minutes_to_actions?',
+    '/minutes_to_actions_test?'
+  );
+if (testDbUrl) {
+  process.env.DATABASE_URL = testDbUrl;
+}
+
 export default defineConfig({
   test: {
     globals: true,

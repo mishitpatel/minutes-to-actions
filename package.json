@@ -5,6 +5,7 @@
   "description": "Paste meeting notes, extract action-items, manage them on a Kanban board",
   "packageManager": "pnpm@9.15.0",
   "scripts": {
+    "predev": "lsof -ti:3000 | xargs kill -9 2>/dev/null || true",
     "dev": "pnpm run --parallel --filter './apps/*' dev",
     "build": "pnpm run --filter './packages/*' build && pnpm run --filter './apps/*' build",
     "test": "pnpm run --recursive test",
@@ -26,7 +27,11 @@
     "typecheck": "pnpm run --recursive typecheck",
     "db:migrate": "pnpm --filter api exec prisma migrate dev",
     "db:studio": "pnpm --filter api exec prisma studio",
-    "db:generate": "pnpm --filter api exec prisma generate"
+    "db:generate": "pnpm --filter api exec prisma generate",
+    "db:test:create": "docker exec mta-postgres psql -U postgres -tc \"SELECT 1 FROM pg_database WHERE datname = 'minutes_to_actions_test'\" | grep -q 1 || docker exec mta-postgres psql -U postgres -c \"CREATE DATABASE minutes_to_actions_test\"",
+    "db:test:migrate": "DATABASE_URL=\"postgresql://postgres:postgres@localhost:5432/minutes_to_actions_test?schema=public\" pnpm --filter api exec prisma migrate deploy",
+    "db:test:setup": "pnpm db:test:create && pnpm db:test:migrate",
+    "pretest:api": "pnpm db:test:setup"
   },
   "devDependencies": {
     "@faker-js/faker": "^10.2.0",

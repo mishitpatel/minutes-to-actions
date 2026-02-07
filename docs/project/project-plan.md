@@ -1,8 +1,8 @@
 # Project Plan — Minutes to Actions (Phase 1 MVP)
 
-> **Last Updated:** 2026-01-22
+> **Last Updated:** 2026-02-07
 > **Phase:** 1 (MVP)
-> **Total User Stories:** 28
+> **Total User Stories:** 29
 
 ## Overview
 
@@ -33,6 +33,7 @@
 | 4   | AI Action-Item Extraction           | US-3.1, US-3.2, US-3.3                 | M2, M3       |
 | 5   | Board Sharing                       | US-5.1 through US-5.6                  | M3           |
 | 6   | Navigation, UX & Polish             | US-6.1, US-6.2, US-7.1, US-7.2, US-7.3 | M1-M5        |
+| 7   | AI Sample Generation                | US-3.4                                  | M4           |
 |     |                                     |                                        |              |
 
 **Parallelization:** M2 and M3 backend work can proceed in parallel after M1. M4 and M5 can proceed in parallel after M3.
@@ -696,6 +697,60 @@
 
 ---
 
+## Milestone 7: AI Sample Generation
+
+**Objective:** Allow users to generate realistic sample meeting notes from presets, enabling quick testing and demo of the extract → board workflow.
+
+**User Stories Covered:**
+- US-3.4: Generate Sample Meeting Notes
+
+**Dependencies:** M4 (reuses Claude API integration)
+
+**Deliverables:**
+- Sample generation API endpoint
+- Generate Sample button with preset dropdown on Create Note page
+- Loading state, overwrite confirmation, error handling
+
+---
+
+### Task 7.1: Sample Generation API Endpoint
+
+**Description:** Create a backend endpoint that calls Claude to generate realistic sample meeting notes based on a meeting type preset.
+
+**References:** US-3.4
+
+**Subtasks:**
+- [ ] Create `POST /api/meeting-notes/generate-sample` endpoint
+- [ ] Define Zod schemas for request (meeting type enum) and response (title + body)
+- [ ] Implement generation prompt for Claude that produces realistic notes with actionable items
+- [ ] Support 3 presets: `weekly-standup`, `one-on-one`, `sprint-retro`
+- [ ] Each preset generates different participant names, topics, and action items naturally embedded in notes
+- [ ] Reuse existing Claude client from `services/claude.ts`
+- [ ] Handle errors: rate limit (429), timeout, invalid response
+- [ ] Write tests (mock Claude API)
+
+---
+
+### Task 7.2: Generate Sample Button UI
+
+**Description:** Add a "Generate Sample" button with preset dropdown to the New Meeting Note page, with loading state and overwrite confirmation.
+
+**References:** US-3.4
+
+**Subtasks:**
+- [ ] Add "Generate Sample" button with dropdown to `NewNotePage`
+- [ ] Dropdown options: "Weekly Standup", "1:1 Meeting", "Sprint Retrospective"
+- [ ] Call `POST /api/meeting-notes/generate-sample` on selection
+- [ ] Show loading state in editor area while generating (spinner/skeleton)
+- [ ] Populate title and body fields when response arrives
+- [ ] If editor has existing content, show confirmation dialog before overwriting
+- [ ] Show error message with retry option on failure
+- [ ] Add `generateSample()` method to `meeting-notes.service.ts`
+- [ ] Add `useGenerateSample()` hook to `useMeetingNotes.ts`
+- [ ] Button not visible on note detail/edit page (create page only)
+
+---
+
 ## Verification Checklist
 
 Before marking MVP complete, verify:
@@ -703,6 +758,7 @@ Before marking MVP complete, verify:
 - [ ] **US-1**: User can sign in with Google and sign out
 - [ ] **US-2**: User can create, view, edit, and delete meeting notes
 - [ ] **US-3**: User can extract action items from a note (including no-result and error cases)
+- [ ] **US-3.4**: User can generate sample meeting notes from a preset on the create page
 - [ ] **US-4**: User can manage action items on Kanban board (create, edit, delete, move)
 - [ ] **US-5**: User can enable/disable sharing, visitors see read-only board
 - [ ] **US-6**: Navigation works, app is responsive

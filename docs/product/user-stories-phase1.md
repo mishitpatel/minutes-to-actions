@@ -213,6 +213,26 @@ This document contains user stories for **Minutes to Actions**, a productivity t
 
 ---
 
+### US-3.4: Generate Sample Meeting Notes
+**As a** User
+**I want to** generate sample meeting notes from a preset template
+**So that** I can quickly test the extraction workflow without writing notes myself
+
+**Acceptance Criteria:**
+- [ ] "Generate Sample" button with a preset dropdown is visible on the Create Meeting Note page
+- [ ] Preset options: **Weekly Standup**, **1:1 Meeting**, **Sprint Retrospective**
+- [ ] Selecting a preset calls the AI to generate a realistic meeting title and body
+- [ ] Loading state is shown in the editor while generating
+- [ ] Generated title and body are filled into the editor fields when ready
+- [ ] If the editor already has content, a confirmation dialog warns before overwriting: "This will replace your current content. Continue?"
+- [ ] If generation fails, a user-friendly error message is shown with a retry option
+- [ ] Generated content is realistic enough to produce meaningful action items when extracted
+- [ ] Button is not visible on the note detail/edit page (create page only)
+
+**Expected Result:** User can generate sample meeting notes with one click, enabling quick demo of the full workflow.
+
+---
+
 ## 4. Action Board (Kanban)
 
 ### US-4.1: View Action Board
@@ -571,13 +591,13 @@ This document contains user stories for **Minutes to Actions**, a productivity t
 |--------------|--------------|
 | Authentication | US-1.1, US-1.2, US-1.3 |
 | Meeting Notes Inbox | US-2.1, US-2.2, US-2.3, US-2.4, US-2.5 |
-| Extract Action-Items | US-3.1, US-3.2, US-3.3 |
+| Extract Action-Items | US-3.1, US-3.2, US-3.3, US-3.4 |
 | Action Board (Kanban) | US-4.1 through US-4.9 |
 | Share Board | US-5.1 through US-5.6 |
 | Navigation & Layout | US-6.1, US-6.2 |
 | Data & State | US-7.1, US-7.2, US-7.3 |
 
-**Total User Stories:** 28
+**Total User Stories:** 29
 
 ### MVP Success Criteria (from Product Spec)
 

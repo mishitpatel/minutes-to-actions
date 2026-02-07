@@ -1,8 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {
   extractActionItems,
+  generateSampleMeetingNotes,
   resetClient,
   type ExtractionResponse,
+  type SampleMeetingNote,
 } from './claude.js';
 import { ExtractionError, RateLimitError } from '../utils/errors.js';
 
@@ -217,6 +219,97 @@ describe('claude service', () => {
 
       await expect(
         extractActionItems('Some meeting notes')
+      ).rejects.toThrow(ExtractionError);
+    });
+  });
+
+  describe('generateSampleMeetingNotes', () => {
+    it('should generate sample meeting notes with title and body', async () => {
+      const expectedResponse: SampleMeetingNote = {
+        title: 'Weekly Team Standup - Feb 7',
+        body: 'Team discussed current progress on the Q1 roadmap...',
+      };
+
+      mockCreate.mockResolvedValueOnce({
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify(expectedResponse),
+          },
+        ],
+      });
+
+      const result = await generateSampleMeetingNotes('weekly-standup');
+
+      expect(result).toEqual(expectedResponse);
+      expect(mockCreate).toHaveBeenCalledTimes(1);
+      expect(mockCreate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 2048,
+          temperature: 0.7,
+        })
+      );
+    });
+
+    it('should handle JSON wrapped in markdown code blocks', async () => {
+      const expectedResponse: SampleMeetingNote = {
+        title: '1:1 Meeting Notes',
+        body: 'Discussed career growth and current project status...',
+      };
+
+      mockCreate.mockResolvedValueOnce({
+        content: [
+          {
+            type: 'text',
+            text: '```json\n' + JSON.stringify(expectedResponse) + '\n```',
+          },
+        ],
+      });
+
+      const result = await generateSampleMeetingNotes('one-on-one');
+
+      expect(result).toEqual(expectedResponse);
+    });
+
+    it('should throw RateLimitError on 429 status', async () => {
+      mockCreate.mockRejectedValueOnce(new MockAPIError(429, 'Rate limited'));
+
+      await expect(
+        generateSampleMeetingNotes('weekly-standup')
+      ).rejects.toThrow(RateLimitError);
+    });
+
+    it('should throw ExtractionError on invalid JSON response', async () => {
+      mockCreate.mockResolvedValueOnce({
+        content: [
+          {
+            type: 'text',
+            text: 'This is not valid JSON',
+          },
+        ],
+      });
+
+      await expect(
+        generateSampleMeetingNotes('sprint-retro')
+      ).rejects.toThrow(ExtractionError);
+    });
+
+    it('should throw ExtractionError on invalid response structure', async () => {
+      mockCreate.mockResolvedValueOnce({
+        content: [
+          {
+            type: 'text',
+            text: JSON.stringify({
+              heading: 'Wrong field',
+              content: 'Wrong field',
+            }),
+          },
+        ],
+      });
+
+      await expect(
+        generateSampleMeetingNotes('weekly-standup')
       ).rejects.toThrow(ExtractionError);
     });
   });

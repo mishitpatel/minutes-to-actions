@@ -11,11 +11,13 @@ import { createMeetingNote, createManyMeetingNotes } from './factories.js';
 import { ExtractionError, RateLimitError } from '../../apps/api/src/utils/errors.js';
 
 // Mock the Claude service - vi.hoisted ensures the fn is available when vi.mock is hoisted
-const { mockExtractActionItems } = vi.hoisted(() => ({
+const { mockExtractActionItems, mockGenerateSampleMeetingNotes } = vi.hoisted(() => ({
   mockExtractActionItems: vi.fn(),
+  mockGenerateSampleMeetingNotes: vi.fn(),
 }));
 vi.mock('../../apps/api/src/services/claude.js', () => ({
   extractActionItems: mockExtractActionItems,
+  generateSampleMeetingNotes: mockGenerateSampleMeetingNotes,
 }));
 
 describe('Meeting Notes API E2E', () => {
@@ -695,6 +697,147 @@ describe('Meeting Notes API E2E', () => {
 
       expect(mockExtractActionItems).toHaveBeenCalledOnce();
       expect(mockExtractActionItems).toHaveBeenCalledWith(noteBody);
+    });
+  });
+
+  // ─── POST /api/v1/meeting-notes/generate-sample ──────────────────────
+
+  describe('POST /api/v1/meeting-notes/generate-sample', () => {
+    beforeEach(() => {
+      mockGenerateSampleMeetingNotes.mockReset();
+    });
+
+    it('should return 401 when not authenticated', async () => {
+      const response = await makeRequest({
+        method: 'POST',
+        url: '/api/v1/meeting-notes/generate-sample',
+        body: { meeting_type: 'weekly-standup' },
+      });
+
+      expect(response.statusCode).toBe(401);
+      const body = parseBody<{ error: { code: string } }>(response);
+      expect(body.error.code).toBe('UNAUTHORIZED');
+    });
+
+    it('should return 200 with title and body for weekly-standup', async () => {
+      const { sessionToken } = await createTestContext();
+
+      mockGenerateSampleMeetingNotes.mockResolvedValueOnce({
+        title: 'Weekly Team Standup - Feb 7',
+        body: 'Team discussed progress on Q1 roadmap...',
+      });
+
+      const response = await makeRequest({
+        method: 'POST',
+        url: '/api/v1/meeting-notes/generate-sample',
+        sessionToken,
+        body: { meeting_type: 'weekly-standup' },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = parseBody<{
+        data: { title: string; body: string };
+      }>(response);
+      expect(body.data.title).toBe('Weekly Team Standup - Feb 7');
+      expect(body.data.body).toBe('Team discussed progress on Q1 roadmap...');
+      expect(mockGenerateSampleMeetingNotes).toHaveBeenCalledWith('weekly-standup');
+    });
+
+    it('should return 200 with title and body for one-on-one', async () => {
+      const { sessionToken } = await createTestContext();
+
+      mockGenerateSampleMeetingNotes.mockResolvedValueOnce({
+        title: '1:1 Meeting - Manager & Report',
+        body: 'Discussed career growth and project status...',
+      });
+
+      const response = await makeRequest({
+        method: 'POST',
+        url: '/api/v1/meeting-notes/generate-sample',
+        sessionToken,
+        body: { meeting_type: 'one-on-one' },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = parseBody<{
+        data: { title: string; body: string };
+      }>(response);
+      expect(body.data.title).toBe('1:1 Meeting - Manager & Report');
+      expect(mockGenerateSampleMeetingNotes).toHaveBeenCalledWith('one-on-one');
+    });
+
+    it('should return 200 with title and body for sprint-retro', async () => {
+      const { sessionToken } = await createTestContext();
+
+      mockGenerateSampleMeetingNotes.mockResolvedValueOnce({
+        title: 'Sprint 12 Retrospective',
+        body: 'What went well: deployment pipeline improvements...',
+      });
+
+      const response = await makeRequest({
+        method: 'POST',
+        url: '/api/v1/meeting-notes/generate-sample',
+        sessionToken,
+        body: { meeting_type: 'sprint-retro' },
+      });
+
+      expect(response.statusCode).toBe(200);
+      const body = parseBody<{
+        data: { title: string; body: string };
+      }>(response);
+      expect(body.data.title).toBe('Sprint 12 Retrospective');
+      expect(mockGenerateSampleMeetingNotes).toHaveBeenCalledWith('sprint-retro');
+    });
+
+    it('should return 400 for invalid meeting type', async () => {
+      const { sessionToken } = await createTestContext();
+
+      const response = await makeRequest({
+        method: 'POST',
+        url: '/api/v1/meeting-notes/generate-sample',
+        sessionToken,
+        body: { meeting_type: 'invalid-type' },
+      });
+
+      expect(response.statusCode).toBe(400);
+    });
+
+    it('should return 429 when rate limited', async () => {
+      const { sessionToken } = await createTestContext();
+
+      mockGenerateSampleMeetingNotes.mockRejectedValueOnce(
+        new RateLimitError('Too many requests')
+      );
+
+      const response = await makeRequest({
+        method: 'POST',
+        url: '/api/v1/meeting-notes/generate-sample',
+        sessionToken,
+        body: { meeting_type: 'weekly-standup' },
+      });
+
+      expect(response.statusCode).toBe(429);
+      const body = parseBody<{ error: { code: string } }>(response);
+      expect(body.error.code).toBe('RATE_LIMITED');
+    });
+
+    it('should return 500 on generation failure', async () => {
+      const { sessionToken } = await createTestContext();
+
+      mockGenerateSampleMeetingNotes.mockRejectedValueOnce(
+        new ExtractionError('AI service error')
+      );
+
+      const response = await makeRequest({
+        method: 'POST',
+        url: '/api/v1/meeting-notes/generate-sample',
+        sessionToken,
+        body: { meeting_type: 'weekly-standup' },
+      });
+
+      expect(response.statusCode).toBe(500);
+      const body = parseBody<{ error: { code: string } }>(response);
+      expect(body.error.code).toBe('EXTRACTION_FAILED');
     });
   });
 });

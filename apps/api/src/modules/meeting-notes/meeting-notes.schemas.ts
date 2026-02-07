@@ -71,6 +71,18 @@ export const extractionResultSchema = z.object({
   }),
 });
 
+// Generate sample schemas
+export const generateSampleSchema = z.object({
+  meeting_type: z.enum(['weekly-standup', 'one-on-one', 'sprint-retro']),
+});
+
+export const generatedSampleResponseSchema = z.object({
+  data: z.object({
+    title: z.string(),
+    body: z.string(),
+  }),
+});
+
 // Inferred types
 export type CreateMeetingNoteInput = z.infer<typeof createMeetingNoteSchema>;
 export type UpdateMeetingNoteInput = z.infer<typeof updateMeetingNoteSchema>;
@@ -78,3 +90,4 @@ export type ListQueryInput = z.infer<typeof listQuerySchema>;
 export type MeetingNoteResponse = z.infer<typeof meetingNoteResponseSchema>;
 export type MeetingNoteWithActions = z.infer<typeof meetingNoteWithActionsSchema>;
 export type ExtractionResult = z.infer<typeof extractionResultSchema>;
+export type GenerateSampleInput = z.infer<typeof generateSampleSchema>;

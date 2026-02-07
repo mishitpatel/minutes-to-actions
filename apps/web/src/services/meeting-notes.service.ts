@@ -43,12 +43,25 @@ export interface ExtractionResult {
   message: string | null;
 }
 
+export interface GenerateSampleData {
+  meeting_type: 'weekly-standup' | 'one-on-one' | 'sprint-retro';
+}
+
+export interface GeneratedSample {
+  title: string;
+  body: string;
+}
+
 interface SingleNoteResponse {
   data: MeetingNote;
 }
 
 interface ExtractionResponse {
   data: ExtractionResult;
+}
+
+interface GenerateSampleResponse {
+  data: GeneratedSample;
 }
 
 export const meetingNotesService = {
@@ -79,6 +92,11 @@ export const meetingNotesService = {
 
   async extractActionItems(id: string): Promise<ExtractionResult> {
     const response = await api.post<ExtractionResponse>(`/meeting-notes/${id}/extract`);
+    return response.data;
+  },
+
+  async generateSample(data: GenerateSampleData): Promise<GeneratedSample> {
+    const response = await api.post<GenerateSampleResponse>('/meeting-notes/generate-sample', data);
     return response.data;
   },
 };

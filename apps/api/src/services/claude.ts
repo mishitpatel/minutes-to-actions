@@ -20,6 +20,15 @@ export const extractionResponseSchema = z.object({
 export type ExtractedActionItem = z.infer<typeof extractedActionItemSchema>;
 export type ExtractionResponse = z.infer<typeof extractionResponseSchema>;
 
+// Schema for sample meeting note generation
+export const sampleMeetingNoteSchema = z.object({
+  title: z.string().min(1),
+  body: z.string().min(1),
+});
+
+export type SampleMeetingNote = z.infer<typeof sampleMeetingNoteSchema>;
+export type MeetingType = 'weekly-standup' | 'one-on-one' | 'sprint-retro';
+
 // Singleton client instance
 let client: Anthropic | null = null;
 
@@ -31,6 +40,22 @@ function getClient(): Anthropic {
   }
   return client;
 }
+
+const GENERATION_SYSTEM_PROMPT = `You are an expert at generating realistic meeting notes. Your task is to create authentic-looking meeting notes for a given meeting type.
+
+The notes should:
+- Feel like real meeting notes taken by a participant
+- Include 3-5 embedded action items with varying priorities
+- Reference realistic team member names and project details
+- Include dates relative to "this week" or "next week"
+- Mix discussion points, decisions, and action items naturally
+- Be 200-400 words in length
+
+Respond ONLY with valid JSON matching this exact structure:
+{
+  "title": "string (a descriptive meeting title)",
+  "body": "string (the full meeting notes text)"
+}`;
 
 const SYSTEM_PROMPT = `You are an expert at extracting action items from meeting notes. Your task is to identify all actionable tasks mentioned in the text.
 
@@ -145,6 +170,92 @@ Extract all action items from these meeting notes.`;
 
     // Unknown errors
     throw new ExtractionError('Failed to extract action items');
+  }
+}
+
+const MEETING_TYPE_PROMPTS: Record<MeetingType, string> = {
+  'weekly-standup': 'Generate realistic meeting notes for a weekly team standup/status meeting. Include updates from 3-4 team members about their current work, blockers, and plans for the week.',
+  'one-on-one': 'Generate realistic meeting notes for a 1:1 meeting between a manager and a direct report. Include discussion about current projects, career development, feedback, and action items.',
+  'sprint-retro': 'Generate realistic meeting notes for a sprint retrospective. Include what went well, what could be improved, and action items for the next sprint.',
+};
+
+export async function generateSampleMeetingNotes(
+  meetingType: MeetingType
+): Promise<SampleMeetingNote> {
+  const anthropic = getClient();
+  const currentDate = new Date().toISOString().split('T')[0];
+
+  const userPrompt = `Current date: ${currentDate}
+
+Meeting type: ${meetingType}
+
+${MEETING_TYPE_PROMPTS[meetingType]}`;
+
+  try {
+    const message = await anthropic.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 2048,
+      temperature: 0.7,
+      system: GENERATION_SYSTEM_PROMPT,
+      messages: [
+        {
+          role: 'user',
+          content: userPrompt,
+        },
+      ],
+    });
+
+    const textContent = message.content.find((block) => block.type === 'text');
+    if (!textContent || textContent.type !== 'text') {
+      throw new ExtractionError('No text content in response');
+    }
+
+    const responseText = textContent.text;
+
+    // Parse JSON from response (handle potential markdown code blocks)
+    let jsonString = responseText;
+    const jsonMatch = responseText.match(/```(?:json)?\s*([\s\S]*?)```/);
+    if (jsonMatch?.[1]) {
+      jsonString = jsonMatch[1].trim();
+    }
+
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(jsonString);
+    } catch {
+      throw new ExtractionError('Invalid JSON in response');
+    }
+
+    const result = sampleMeetingNoteSchema.safeParse(parsed);
+    if (!result.success) {
+      throw new ExtractionError(
+        `Invalid response structure: ${result.error.message}`
+      );
+    }
+
+    return result.data;
+  } catch (error) {
+    // Re-throw our custom errors
+    if (error instanceof ExtractionError || error instanceof RateLimitError) {
+      throw error;
+    }
+
+    // Handle Anthropic API errors (use duck typing for better testability)
+    if (isAPIError(error)) {
+      if (error.status === 429) {
+        throw new RateLimitError('AI service temporarily unavailable');
+      }
+      if (error.status === 401) {
+        throw new ExtractionError('AI service configuration error');
+      }
+      if (error.status === 408 || error.message.includes('timeout')) {
+        throw new ExtractionError('Request timed out');
+      }
+      throw new ExtractionError(`API error: ${error.message}`);
+    }
+
+    // Unknown errors
+    throw new ExtractionError('Failed to generate sample meeting notes');
   }
 }
 

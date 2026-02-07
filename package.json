@@ -14,6 +14,7 @@
     "test:api:report": "vitest run --config tests/vitest.config.ts --reporter=default --reporter=json --reporter=junit --outputFile.json=../api-test-results/results.json --outputFile.junit=../api-test-results/results.xml",
     "test:api:ui": "vitest --config tests/vitest.config.ts --ui",
     "test:api:coverage": "vitest run --config tests/vitest.config.ts --coverage",
+    "test:api:html": "vitest run --config tests/vitest.config.ts --reporter=default --reporter=./tests/reporters/http-html-reporter.ts",
     "test:e2e": "playwright test --project=chromium",
     "test:e2e:all": "playwright test",
     "test:e2e:firefox": "playwright test --project=firefox",

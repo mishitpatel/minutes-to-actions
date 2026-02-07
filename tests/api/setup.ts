@@ -9,6 +9,26 @@
 import { createApp } from '../../apps/api/src/app.js';
 import { createSession } from '../../apps/api/src/services/session.js';
 import { prisma as prismaClient } from '../../apps/api/src/lib/prisma.js';
+import { getCurrentTest } from 'vitest/suite';
+
+declare module 'vitest' {
+  interface TaskMeta {
+    httpInteractions?: HttpInteraction[];
+  }
+}
+
+export interface HttpInteraction {
+  request: {
+    method: string;
+    url: string;
+    body?: unknown;
+    hasAuth: boolean;
+  };
+  response: {
+    statusCode: number;
+    body: string;
+  };
+}
 
 // Type for the Fastify app instance (inferred from createApp return type)
 type FastifyInstance = Awaited<ReturnType<typeof createApp>>;
@@ -174,6 +194,26 @@ export async function makeRequest(options: RequestOptions): Promise<TestResponse
   });
 
   const testResponse = response as TestResponse;
+
+  // Attach HTTP interaction data to test metadata for the HTML reporter
+  const currentTest = getCurrentTest();
+  if (currentTest) {
+    if (!currentTest.meta.httpInteractions) {
+      currentTest.meta.httpInteractions = [];
+    }
+    currentTest.meta.httpInteractions.push({
+      request: {
+        method: options.method,
+        url: options.url,
+        body: options.body,
+        hasAuth: !!options.sessionToken,
+      },
+      response: {
+        statusCode: testResponse.statusCode,
+        body: testResponse.body,
+      },
+    });
+  }
 
   if (process.env.LOG_REQUESTS !== 'false') {
     logRequestResponse(options, testResponse);

@@ -56,13 +56,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `extractActionItems()` method in meeting-notes service
 - `bulkCreate()` method in action-items service
 - `useExtractActionItems()` and `useBulkCreateActionItems()` React Query hooks
+- AI sample meeting notes generation service `generateSampleMeetingNotes()` in claude.ts (Task 7.1)
+- `POST /meeting-notes/generate-sample` endpoint with Zod-validated request/response schemas (Task 7.1)
+- Meeting type prompts for weekly-standup, one-on-one, and sprint-retro generation
+- "Generate Sample" dropdown button on NewNotePage with 3 meeting type options (Task 7.2)
+- Overwrite confirmation dialog when generating sample over existing editor content
+- Loading overlay with spinner on NoteEditor during AI generation
+- `useGenerateSample()` React Query mutation hook
+- `generateSample()` method in meeting-notes frontend service
+- Unit tests for `generateSampleMeetingNotes()` (5 tests: happy path, code-block handling, rate limit, invalid JSON, invalid structure)
+- API E2E tests for generate-sample endpoint (7 tests: auth, all 3 meeting types, invalid type, rate limit, generation failure)
+- HTTP interaction metadata tracking in test setup for HTML reporter
+- `test:api:html` script for interactive HTML test reports
+- Custom HTML test reporter (`tests/reporters/http-html-reporter.ts`)
 
 ### Changed
 - Reformatted CLAUDE.md "First Time Setup" section for consistency
 - Added deprecation note to `packages/shared` - API module Zod schemas are source of truth
+- NoteEditor now accepts `externalData`, `onChange`, and `isGenerating` props for AI generation integration
 
 ### Fixed
--
+- Fixed `due_date` format in ExtractionReviewPanel — appends `T00:00:00.000Z` to date-only strings for valid ISO timestamps
 
 ### Removed
 -

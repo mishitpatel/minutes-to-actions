@@ -1,14 +1,14 @@
 # Project Status
 
-> Last Updated: 2026-02-06
+> Last Updated: 2026-02-07
 > Updated By: Claude Code
 
 ## Current Position
 
 **Phase:** 1 (MVP)
-**Milestone:** M4 - AI Action-Item Extraction
-**Task:** Task 4.3 - Extraction Review UI
-**Status:** Task 4.3 Complete
+**Milestone:** M7 - AI Sample Generation
+**Task:** Task 7.2 - Generate Sample Button UI
+**Status:** Milestone 7 Complete
 
 → See `project-plan.md` for full task details and subtasks
 
@@ -21,9 +21,9 @@
 ## Session Context
 
 ### Current Task Reference
-- **Location:** `project-plan.md` → Milestone 4 → Task 4.3
-- **Files to modify:** `apps/web/src/` (services, hooks, components, pages)
-- **Reference docs:** `docs/product/user-stories-phase1.md` (US-3.1, US-3.2, US-3.3)
+- **Location:** `project-plan.md` → Milestone 7 → Task 7.2
+- **Files to modify:** Complete - all M7 files implemented
+- **Reference docs:** `docs/product/user-stories-phase1.md` (US-3.4)
 
 ### Recent Decisions
 | Date | Decision | Rationale |
@@ -33,6 +33,18 @@
 | 2026-01-20 | devops/ folder | Separate operational from state docs |
 
 ### Session Log
+**2026-02-07 - Milestone 7 Complete (AI Sample Generation)**
+- Implemented `generateSampleMeetingNotes()` in claude.ts with meeting-type-specific prompts (weekly-standup, one-on-one, sprint-retro)
+- Added `POST /meeting-notes/generate-sample` endpoint with Zod schemas and auth
+- Created "Generate Sample" dropdown button on NewNotePage with overwrite confirmation
+- Added loading overlay in NoteEditor during AI generation
+- Added `externalData`, `onChange`, `isGenerating` props to NoteEditor
+- Fixed `due_date` format bug in ExtractionReviewPanel (date-only strings → ISO)
+- 5 unit tests for generation service, 7 API E2E tests for endpoint
+- Added HTTP interaction metadata tracking + custom HTML test reporter
+- Closed GitHub issues #44, #45; closed milestone M7
+- **Milestones M1–M4 and M7 complete. Next: M5 (Board Sharing) or M6 (Polish)**
+
 **2026-02-06 - Task 4.3 Complete (Extraction Review UI)**
 - Created `apps/web/src/components/ExtractionReviewPanel.tsx` - Full extraction workflow UI
 - Added `extractActionItems()` to meeting-notes.service.ts

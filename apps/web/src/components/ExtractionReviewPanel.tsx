@@ -104,7 +104,9 @@ export function ExtractionReviewPanel({ noteId }: ExtractionReviewPanelProps) {
           description: item.description,
           priority: item.priority,
           status: 'todo' as const,
-          due_date: item.due_date,
+          due_date: item.due_date && !item.due_date.includes('T')
+            ? `${item.due_date}T00:00:00.000Z`
+            : item.due_date,
         })),
       },
       {

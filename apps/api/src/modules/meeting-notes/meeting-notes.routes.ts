@@ -12,6 +12,8 @@ import {
   createdMeetingNoteResponseSchema,
   meetingNoteResponseSchema,
   extractionResultSchema,
+  generateSampleSchema,
+  generatedSampleResponseSchema,
 } from './meeting-notes.schemas.js';
 import * as handler from './meeting-notes.handler.js';
 
@@ -38,6 +40,29 @@ export default async function meetingNotesRoutes(fastify: FastifyInstance) {
       const userId = request.user!.id;
 
       return handler.listMeetingNotes({ userId, page, limit });
+    }
+  );
+
+  // POST /meeting-notes/generate-sample - Generate sample meeting notes using AI
+  f.post(
+    '/meeting-notes/generate-sample',
+    {
+      onRequest: [fastify.authenticate],
+      schema: {
+        description: 'Generate sample meeting notes using AI',
+        tags: ['meeting-notes'],
+        body: generateSampleSchema,
+        response: {
+          200: generatedSampleResponseSchema,
+          401: errorResponseSchema,
+          429: errorResponseSchema,
+          500: errorResponseSchema,
+        },
+      },
+    },
+    async (request) => {
+      const result = await handler.generateSample(request.body.meeting_type);
+      return { data: result };
     }
   );
 

@@ -455,6 +455,9 @@ pnpm test:api:ui
 # Coverage report (text + HTML)
 pnpm test:api:coverage
 
+# Interactive HTML report with HTTP request/response bodies
+pnpm test:api:html
+
 # Run specific test file
 pnpm test:api tests/api/auth.test.ts
 ```

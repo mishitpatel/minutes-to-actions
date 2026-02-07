@@ -3,6 +3,7 @@ import {
   meetingNotesService,
   type CreateNoteData,
   type UpdateNoteData,
+  type GenerateSampleData,
 } from '../services/meeting-notes.service';
 
 export const MEETING_NOTES_QUERY_KEY = ['meeting-notes'];
@@ -72,5 +73,11 @@ export function useMeetingNote(id: string) {
 export function useExtractActionItems() {
   return useMutation({
     mutationFn: (noteId: string) => meetingNotesService.extractActionItems(noteId),
+  });
+}
+
+export function useGenerateSample() {
+  return useMutation({
+    mutationFn: (data: GenerateSampleData) => meetingNotesService.generateSample(data),
   });
 }

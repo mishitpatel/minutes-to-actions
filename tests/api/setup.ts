@@ -6,7 +6,7 @@
  * rely on existing data.
  */
 
-import { createApp, type AppOptions } from '../../apps/api/src/app.js';
+import { createApp } from '../../apps/api/src/app.js';
 import { createSession } from '../../apps/api/src/services/session.js';
 import { prisma as prismaClient } from '../../apps/api/src/lib/prisma.js';
 
@@ -172,7 +172,44 @@ export async function makeRequest(options: RequestOptions): Promise<TestResponse
     cookies: options.sessionToken ? { [SESSION_COOKIE_NAME]: options.sessionToken } : undefined,
     headers: options.headers,
   });
-  return response as TestResponse;
+
+  const testResponse = response as TestResponse;
+
+  if (process.env.LOG_REQUESTS !== 'false') {
+    logRequestResponse(options, testResponse);
+  }
+
+  return testResponse;
+}
+
+/**
+ * Log request/response details for debugging (visible in Vitest UI Console tab).
+ */
+function logRequestResponse(options: RequestOptions, response: TestResponse): void {
+  const reqBody = options.body ? JSON.stringify(options.body, null, 2) : '(none)';
+  const resBody = formatResponseBody(response.body);
+
+  console.log(
+    `\n┌─ REQUEST ────────────────────────────────────\n` +
+      `│ ${options.method} ${options.url}\n` +
+      `│ Auth: ${options.sessionToken ? 'yes' : 'no'}\n` +
+      `│ Body: ${reqBody}\n` +
+      `├─ RESPONSE ───────────────────────────────────\n` +
+      `│ Status: ${response.statusCode}\n` +
+      `│ Body: ${resBody}\n` +
+      `└──────────────────────────────────────────────`
+  );
+}
+
+function formatResponseBody(body: string): string {
+  if (!body) {
+    return '(empty)';
+  }
+  try {
+    return JSON.stringify(JSON.parse(body), null, 2);
+  } catch {
+    return body;
+  }
 }
 
 /**

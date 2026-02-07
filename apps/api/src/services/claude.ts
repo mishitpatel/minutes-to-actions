@@ -94,7 +94,6 @@ Extract all action items from these meeting notes.`;
       ],
     });
 
-    // Extract text content from response
     const textContent = message.content.find((block) => block.type === 'text');
     if (!textContent || textContent.type !== 'text') {
       throw new ExtractionError('No text content in response');
@@ -116,7 +115,6 @@ Extract all action items from these meeting notes.`;
       throw new ExtractionError('Invalid JSON in response');
     }
 
-    // Validate against schema
     const result = extractionResponseSchema.safeParse(parsed);
     if (!result.success) {
       throw new ExtractionError(
@@ -150,11 +148,9 @@ Extract all action items from these meeting notes.`;
   }
 }
 
-// Type guard for API errors (duck typing for better testability)
 interface APIErrorLike {
   status: number;
   message: string;
-  name: string;
 }
 
 function isAPIError(error: unknown): error is APIErrorLike {
@@ -164,9 +160,7 @@ function isAPIError(error: unknown): error is APIErrorLike {
     'status' in error &&
     typeof (error as APIErrorLike).status === 'number' &&
     'message' in error &&
-    typeof (error as APIErrorLike).message === 'string' &&
-    'name' in error &&
-    (error as APIErrorLike).name === 'APIError'
+    typeof (error as APIErrorLike).message === 'string'
   );
 }
 

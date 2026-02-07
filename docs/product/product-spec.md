@@ -72,6 +72,14 @@ User can:
 - No editing allowed; source note links hidden from visitors
 - User can **revoke** and **regenerate** the link
 
+#### F) Generate Sample Meeting Notes (AI)
+- On the **Create Meeting Note** page, user can generate realistic sample notes
+- User picks a **meeting type preset**: Weekly Standup, 1:1 Meeting, or Sprint Retrospective
+- System calls Claude to generate a title and body matching the chosen type
+- Loading state shown during generation; fields populated when ready
+- If the editor already has content, a confirmation dialog warns before overwriting
+- Purpose: quick testing and demo of the extract → board workflow
+
 ### MVP success criteria (Acceptance)
 - User can create a meeting note and extract **at least 1** action-item
 - User can move action-items across **To Do / Doing / Done**
@@ -126,7 +134,7 @@ User can:
 
 ### Flow 2: Create meeting note → Extract action-items
 1. User clicks **New Meeting Note**
-2. Pastes meeting notes and saves
+2. Pastes meeting notes (or clicks **Generate Sample** and picks a preset) and saves
 3. Clicks **Extract action-items**
 4. Previews extracted items, edits if needed
 5. Saves action-items to board
@@ -154,6 +162,7 @@ User can:
 - Meeting notes list (sorted by recent)
 - **New Meeting Note** button
 - Note editor (title optional, body required)
+- **Generate Sample** button with preset dropdown (Weekly Standup, 1:1 Meeting, Sprint Retro) on create page
 - Note detail view with **Extract action-items** button
 - List of linked action-items on note detail
 
@@ -199,6 +208,8 @@ User can:
 | Priority levels | High / Medium / Low | Simple three-tier system |
 | Terminology | "meeting-notes" and "action-items" | Consistent naming throughout |
 | Note-action linking | Action-items link to source note | Provides context and traceability |
+| Sample generation presets | 3 types (standup, 1:1, retro) | Minimal set covering common meetings |
+| Sample generation placement | Create page only | Keep scope small, avoid cluttering detail view |
 
 ---
 

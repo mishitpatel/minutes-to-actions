@@ -98,6 +98,7 @@ When working on a task:
 | M4: AI Extraction | US-3.1, US-3.2, US-3.3 |
 | M5: Sharing | US-5.1 through US-5.6 |
 | M6: Polish | US-6.1, US-6.2, US-7.1, US-7.2, US-7.3 |
+| M7: AI Sample Generation | US-3.4 |
 
 ### Git Workflow
 

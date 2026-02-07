@@ -56,13 +56,16 @@ export const api = {
   },
 
   async post<T>(endpoint: string, data?: unknown): Promise<T> {
+    const headers: Record<string, string> = {
+      'Accept': 'application/json',
+    };
+    if (data) {
+      headers['Content-Type'] = 'application/json';
+    }
     const response = await fetch(`${API_URL}${endpoint}`, {
       method: 'POST',
       credentials: 'include',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: data ? JSON.stringify(data) : undefined,
     });
     return handleResponse<T>(response);

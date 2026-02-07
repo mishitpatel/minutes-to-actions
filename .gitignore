@@ -36,6 +36,10 @@ api-test-results/
 apps/api/prisma/*.db
 apps/api/prisma/*.db-journal
 
+# Test artifacts
+playwright-report/
+test-results/
+
 # Misc
 *.tsbuildinfo
 .turbo/

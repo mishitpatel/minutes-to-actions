@@ -1,7 +1,21 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { AlertTriangle } from 'lucide-react';
 import { useActionItem, useActionItems } from '../hooks/useActionItems';
 import { ConfirmDialog } from './ConfirmDialog';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Textarea } from './ui/textarea';
+import { Label } from './ui/label';
+import { Badge } from './ui/badge';
+import { Spinner } from './ui/spinner';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from './ui/dialog';
 import type { Priority, Status } from '../services/action-items.service';
 
 interface ActionItemDetailModalProps {
@@ -11,15 +25,15 @@ interface ActionItemDetailModalProps {
 }
 
 const PRIORITY_STYLES = {
-  high: 'bg-red-100 text-red-800',
-  medium: 'bg-yellow-100 text-yellow-800',
-  low: 'bg-green-100 text-green-800',
+  high: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 border-transparent',
+  medium: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400 border-transparent',
+  low: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 border-transparent',
 } as const;
 
 const STATUS_STYLES = {
-  todo: 'bg-gray-100 text-gray-800',
-  doing: 'bg-blue-100 text-blue-800',
-  done: 'bg-green-100 text-green-800',
+  todo: 'bg-secondary text-secondary-foreground border-transparent',
+  doing: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 border-transparent',
+  done: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 border-transparent',
 } as const;
 
 const PRIORITY_OPTIONS: { value: Priority; label: string }[] = [
@@ -74,7 +88,6 @@ export function ActionItemDetailModal({
   onClose,
   onDeleted,
 }: ActionItemDetailModalProps) {
-  const dialogRef = useRef<HTMLDivElement>(null);
   const { data: item, isLoading, isError } = useActionItem(itemId ?? '');
   const { updateItem, isUpdating, deleteItem, isDeleting } = useActionItems();
 
@@ -101,41 +114,6 @@ export function ActionItemDetailModal({
       setIsEditing(false);
     }
   }, [item]);
-
-  // Focus dialog when opened
-  useEffect(() => {
-    if (itemId) {
-      dialogRef.current?.focus();
-    }
-  }, [itemId]);
-
-  // Handle escape key
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && itemId && !isUpdating && !isDeleting && !showDeleteDialog) {
-        if (isEditing) {
-          handleCancelEdit();
-        } else {
-          onClose();
-        }
-      }
-    };
-
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [itemId, isUpdating, isDeleting, isEditing, showDeleteDialog, onClose]);
-
-  if (!itemId) return null;
-
-  const handleOverlayClick = () => {
-    if (!isUpdating && !isDeleting) {
-      if (isEditing) {
-        handleCancelEdit();
-      } else {
-        onClose();
-      }
-    }
-  };
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -165,7 +143,7 @@ export function ActionItemDetailModal({
 
     updateItem(
       {
-        id: itemId,
+        id: itemId!,
         data: {
           title: trimmedTitle,
           description: description.trim() || null,
@@ -188,7 +166,7 @@ export function ActionItemDetailModal({
   };
 
   const handleConfirmDelete = () => {
-    deleteItem(itemId, {
+    deleteItem(itemId!, {
       onSuccess: () => {
         setShowDeleteDialog(false);
         onDeleted?.();
@@ -199,338 +177,257 @@ export function ActionItemDetailModal({
 
   const overdue = item?.due_date && isOverdue(item.due_date, item.status);
 
+  const handleOpenChange = (isOpen: boolean) => {
+    if (!isOpen && !isUpdating && !isDeleting) {
+      if (isEditing) {
+        handleCancelEdit();
+      } else {
+        onClose();
+      }
+    }
+  };
+
   return (
     <>
-      <div className="fixed inset-0 z-50 overflow-y-auto">
-        <div className="flex min-h-full items-center justify-center p-4">
-          <div
-            className="fixed inset-0 bg-black/50 transition-opacity"
-            onClick={handleOverlayClick}
-            aria-hidden="true"
-          />
-
-          <div
-            ref={dialogRef}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="modal-title"
-            tabIndex={-1}
-            className="relative bg-white rounded-lg shadow-xl max-w-lg w-full focus:outline-none"
-          >
-            {/* Loading state */}
-            {isLoading && (
-              <div className="p-8">
-                <div className="flex items-center justify-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                </div>
+      <Dialog open={!!itemId} onOpenChange={handleOpenChange}>
+        <DialogContent className="sm:max-w-lg">
+          {/* Loading state */}
+          {isLoading && (
+            <div className="p-8">
+              <div className="flex items-center justify-center">
+                <Spinner />
               </div>
-            )}
+            </div>
+          )}
 
-            {/* Error state */}
-            {isError && (
-              <div className="p-8">
-                <div className="flex flex-col items-center justify-center text-center">
-                  <svg
-                    className="w-12 h-12 text-red-400 mb-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+          {/* Error state */}
+          {isError && (
+            <div className="p-8">
+              <div className="flex flex-col items-center justify-center text-center">
+                <AlertTriangle className="h-12 w-12 text-destructive mb-4" />
+                <h3 className="text-lg font-medium text-foreground mb-2">
+                  Failed to load action item
+                </h3>
+                <p className="text-muted-foreground mb-4">
+                  The item may have been deleted or you don't have access.
+                </p>
+                <Button variant="secondary" onClick={onClose}>
+                  Close
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Content */}
+          {!isLoading && !isError && item && (
+            <>
+              <DialogHeader>
+                {isEditing ? (
+                  <div>
+                    <Input
+                      type="text"
+                      value={title}
+                      onChange={(e) => {
+                        setTitle(e.target.value);
+                        if (errors.title) setErrors({});
+                      }}
+                      className={`text-lg font-semibold ${
+                        errors.title ? 'border-destructive' : ''
+                      }`}
+                      placeholder="Title"
                     />
-                  </svg>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    Failed to load action item
-                  </h3>
-                  <p className="text-gray-500 mb-4">
-                    The item may have been deleted or you don't have access.
-                  </p>
-                  <button
-                    onClick={onClose}
-                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-                  >
-                    Close
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Content */}
-            {!isLoading && !isError && item && (
-              <>
-                {/* Header with close button */}
-                <div className="flex items-start justify-between p-4 border-b border-gray-200">
-                  <div className="flex-1 min-w-0 pr-4">
-                    {isEditing ? (
-                      <div>
-                        <input
-                          type="text"
-                          value={title}
-                          onChange={(e) => {
-                            setTitle(e.target.value);
-                            if (errors.title) setErrors({});
-                          }}
-                          className={`w-full text-lg font-semibold text-gray-900 border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                            errors.title ? 'border-red-500' : 'border-gray-300'
-                          }`}
-                          placeholder="Title"
-                        />
-                        {errors.title && (
-                          <p className="text-red-500 text-sm mt-1">{errors.title}</p>
-                        )}
-                      </div>
-                    ) : (
-                      <h2
-                        id="modal-title"
-                        className="text-lg font-semibold text-gray-900"
-                      >
-                        {item.title}
-                      </h2>
+                    {errors.title && (
+                      <p className="text-destructive text-sm mt-1">{errors.title}</p>
                     )}
                   </div>
-                  <button
-                    onClick={onClose}
-                    disabled={isUpdating || isDeleting}
-                    className="text-gray-400 hover:text-gray-600 p-1 rounded transition-colors disabled:opacity-50"
-                    aria-label="Close"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
+                ) : (
+                  <DialogTitle>{item.title}</DialogTitle>
+                )}
+              </DialogHeader>
 
-                {/* Body */}
-                <div className="p-4 space-y-4">
-                  {/* Priority and Status */}
-                  <div className="flex items-center gap-4">
-                    {isEditing ? (
-                      <>
-                        <div className="flex-1">
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Priority
-                          </label>
-                          <select
-                            value={priority}
-                            onChange={(e) => setPriority(e.target.value as Priority)}
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          >
-                            {PRIORITY_OPTIONS.map((opt) => (
-                              <option key={opt.value} value={opt.value}>
-                                {opt.label}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                        <div className="flex-1">
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Status
-                          </label>
-                          <select
-                            value={status}
-                            onChange={(e) => setStatus(e.target.value as Status)}
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          >
-                            {STATUS_OPTIONS.map((opt) => (
-                              <option key={opt.value} value={opt.value}>
-                                {opt.label}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                      </>
-                    ) : (
-                      <>
-                        <span
-                          className={`text-sm px-3 py-1 rounded-full font-medium capitalize ${PRIORITY_STYLES[item.priority]}`}
-                        >
-                          {item.priority}
-                        </span>
-                        <span
-                          className={`text-sm px-3 py-1 rounded-full font-medium ${STATUS_STYLES[item.status]}`}
-                        >
-                          {STATUS_OPTIONS.find((opt) => opt.value === item.status)?.label}
-                        </span>
-                      </>
-                    )}
-                  </div>
-
-                  {/* Due Date */}
-                  <div>
-                    {isEditing ? (
-                      <>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Due Date
-                        </label>
-                        <input
-                          type="date"
-                          value={dueDate}
-                          onChange={(e) => setDueDate(e.target.value)}
-                          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                      </>
-                    ) : (
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-gray-500">Due:</span>
-                        {item.due_date ? (
-                          <span
-                            className={`text-sm ${
-                              overdue ? 'text-red-600 font-medium' : 'text-gray-700'
-                            }`}
-                          >
-                            {overdue && (
-                              <svg
-                                className="w-4 h-4 inline mr-1"
-                                fill="currentColor"
-                                viewBox="0 0 20 20"
-                              >
-                                <path
-                                  fillRule="evenodd"
-                                  d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                                  clipRule="evenodd"
-                                />
-                              </svg>
-                            )}
-                            {formatDate(item.due_date)}
-                          </span>
-                        ) : (
-                          <span className="text-sm text-gray-400 italic">Not set</span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Description */}
-                  <div>
-                    {isEditing ? (
-                      <>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Description
-                        </label>
-                        <textarea
-                          value={description}
-                          onChange={(e) => setDescription(e.target.value)}
-                          rows={4}
-                          className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                          placeholder="Add a description..."
-                        />
-                      </>
-                    ) : (
-                      <>
-                        <span className="text-sm font-medium text-gray-500">Description</span>
-                        <p className="text-sm text-gray-700 mt-1 whitespace-pre-wrap">
-                          {item.description || (
-                            <span className="text-gray-400 italic">No description</span>
-                          )}
-                        </p>
-                      </>
-                    )}
-                  </div>
-
-                  {/* Source Note (view mode only) */}
-                  {!isEditing && (
-                    <div>
-                      <span className="text-sm font-medium text-gray-500">Source Note</span>
-                      <div className="mt-1">
-                        {item.meeting_note ? (
-                          <Link
-                            to={`/notes/${item.meeting_note.id}`}
-                            className="text-sm text-blue-600 hover:text-blue-800 hover:underline"
-                          >
-                            {item.meeting_note.title || 'Untitled Note'}
-                          </Link>
-                        ) : item.meeting_note_id ? (
-                          <span className="text-sm text-gray-400 italic">Note deleted</span>
-                        ) : (
-                          <span className="text-sm text-gray-400 italic">None</span>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Timestamps (view mode only) */}
-                  {!isEditing && (
-                    <div className="pt-3 border-t border-gray-100 text-xs text-gray-400 space-y-1">
-                      <p>Created: {formatDateTime(item.created_at)}</p>
-                      <p>Updated: {formatDateTime(item.updated_at)}</p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Footer */}
-                <div className="flex items-center justify-between p-4 border-t border-gray-200 bg-gray-50 rounded-b-lg">
+              {/* Body */}
+              <div className="space-y-4">
+                {/* Priority and Status */}
+                <div className="flex items-center gap-4">
                   {isEditing ? (
                     <>
-                      <div />
-                      <div className="flex gap-3">
-                        <button
-                          type="button"
-                          onClick={handleCancelEdit}
-                          disabled={isUpdating}
-                          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      <div className="flex-1">
+                        <Label>Priority</Label>
+                        <select
+                          value={priority}
+                          onChange={(e) => setPriority(e.target.value as Priority)}
+                          className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                         >
-                          Cancel
-                        </button>
-                        <button
-                          type="button"
-                          onClick={handleSave}
-                          disabled={isUpdating}
-                          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                          {PRIORITY_OPTIONS.map((opt) => (
+                            <option key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="flex-1">
+                        <Label>Status</Label>
+                        <select
+                          value={status}
+                          onChange={(e) => setStatus(e.target.value as Status)}
+                          className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                         >
-                          {isUpdating && (
-                            <svg
-                              className="animate-spin h-4 w-4"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                            >
-                              <circle
-                                className="opacity-25"
-                                cx="12"
-                                cy="12"
-                                r="10"
-                                stroke="currentColor"
-                                strokeWidth="4"
-                              />
-                              <path
-                                className="opacity-75"
-                                fill="currentColor"
-                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                              />
-                            </svg>
-                          )}
-                          {isUpdating ? 'Saving...' : 'Save'}
-                        </button>
+                          {STATUS_OPTIONS.map((opt) => (
+                            <option key={opt.value} value={opt.value}>
+                              {opt.label}
+                            </option>
+                          ))}
+                        </select>
                       </div>
                     </>
                   ) : (
                     <>
-                      <button
-                        type="button"
-                        onClick={handleDeleteClick}
-                        disabled={isDeleting}
-                        className="px-4 py-2 text-sm font-medium text-red-600 bg-white border border-red-300 rounded-lg hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        Delete
-                      </button>
-                      <button
-                        type="button"
-                        onClick={handleEditClick}
-                        className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                      >
-                        Edit
-                      </button>
+                      <Badge className={PRIORITY_STYLES[item.priority]}>
+                        {item.priority}
+                      </Badge>
+                      <Badge className={STATUS_STYLES[item.status]}>
+                        {STATUS_OPTIONS.find((opt) => opt.value === item.status)?.label}
+                      </Badge>
                     </>
                   )}
                 </div>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
+
+                {/* Due Date */}
+                <div>
+                  {isEditing ? (
+                    <>
+                      <Label>Due Date</Label>
+                      <Input
+                        type="date"
+                        value={dueDate}
+                        onChange={(e) => setDueDate(e.target.value)}
+                        className="mt-1"
+                      />
+                    </>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-muted-foreground">Due:</span>
+                      {item.due_date ? (
+                        <span
+                          className={`text-sm ${
+                            overdue ? 'text-destructive font-medium' : 'text-foreground'
+                          }`}
+                        >
+                          {overdue && (
+                            <AlertTriangle className="h-4 w-4 inline mr-1" />
+                          )}
+                          {formatDate(item.due_date)}
+                        </span>
+                      ) : (
+                        <span className="text-sm text-muted-foreground italic">Not set</span>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Description */}
+                <div>
+                  {isEditing ? (
+                    <>
+                      <Label>Description</Label>
+                      <Textarea
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        rows={4}
+                        className="mt-1 resize-none"
+                        placeholder="Add a description..."
+                      />
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-sm font-medium text-muted-foreground">Description</span>
+                      <p className="text-sm text-foreground mt-1 whitespace-pre-wrap">
+                        {item.description || (
+                          <span className="text-muted-foreground italic">No description</span>
+                        )}
+                      </p>
+                    </>
+                  )}
+                </div>
+
+                {/* Source Note (view mode only) */}
+                {!isEditing && (
+                  <div>
+                    <span className="text-sm font-medium text-muted-foreground">Source Note</span>
+                    <div className="mt-1">
+                      {item.meeting_note ? (
+                        <Link
+                          to={`/notes/${item.meeting_note.id}`}
+                          className="text-sm text-primary hover:text-primary/80 hover:underline"
+                        >
+                          {item.meeting_note.title || 'Untitled Note'}
+                        </Link>
+                      ) : item.meeting_note_id ? (
+                        <span className="text-sm text-muted-foreground italic">Note deleted</span>
+                      ) : (
+                        <span className="text-sm text-muted-foreground italic">None</span>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Timestamps (view mode only) */}
+                {!isEditing && (
+                  <div className="pt-3 border-t border-border text-xs text-muted-foreground space-y-1">
+                    <p>Created: {formatDateTime(item.created_at)}</p>
+                    <p>Updated: {formatDateTime(item.updated_at)}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Footer */}
+              <DialogFooter className="sm:justify-between">
+                {isEditing ? (
+                  <>
+                    <div />
+                    <div className="flex gap-3">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleCancelEdit}
+                        disabled={isUpdating}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        type="button"
+                        onClick={handleSave}
+                        disabled={isUpdating}
+                      >
+                        {isUpdating && <Spinner size="sm" className="text-current" />}
+                        {isUpdating ? 'Saving...' : 'Save'}
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="text-destructive border-destructive/30 hover:bg-destructive/10"
+                      onClick={handleDeleteClick}
+                      disabled={isDeleting}
+                    >
+                      Delete
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={handleEditClick}
+                    >
+                      Edit
+                    </Button>
+                  </>
+                )}
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Delete confirmation dialog */}
       <ConfirmDialog

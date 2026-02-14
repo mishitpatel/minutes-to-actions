@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import {
   actionItemsService,
   type Status,
@@ -29,6 +30,10 @@ export function useActionItems() {
     mutationFn: (itemData: CreateActionItemData) => actionItemsService.create(itemData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ACTION_ITEMS_QUERY_KEY });
+      toast.success('Action item created');
+    },
+    onError: () => {
+      toast.error('Failed to create action item');
     },
   });
 
@@ -37,6 +42,10 @@ export function useActionItems() {
       actionItemsService.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ACTION_ITEMS_QUERY_KEY });
+      toast.success('Action item updated');
+    },
+    onError: () => {
+      toast.error('Failed to update action item');
     },
   });
 
@@ -44,6 +53,10 @@ export function useActionItems() {
     mutationFn: (id: string) => actionItemsService.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ACTION_ITEMS_QUERY_KEY });
+      toast.success('Action item deleted');
+    },
+    onError: () => {
+      toast.error('Failed to delete action item');
     },
   });
 
@@ -146,6 +159,7 @@ export function useMoveActionItem() {
       if (context?.previousItems) {
         queryClient.setQueryData(queryKey, context.previousItems);
       }
+      toast.error('Failed to move item');
     },
     onSettled: () => {
       // Always refetch after error or success

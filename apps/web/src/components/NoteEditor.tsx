@@ -1,4 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Textarea } from './ui/textarea';
+import { Label } from './ui/label';
+import { Spinner } from './ui/spinner';
 
 export interface NoteEditorData {
   title: string;
@@ -68,14 +73,11 @@ export function NoteEditor({
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div>
-        <label
-          htmlFor="note-title"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
+        <Label htmlFor="note-title">
           Title{' '}
-          <span className="text-gray-400 font-normal">(optional)</span>
-        </label>
-        <input
+          <span className="text-muted-foreground font-normal">(optional)</span>
+        </Label>
+        <Input
           id="note-title"
           type="text"
           value={title}
@@ -85,19 +87,16 @@ export function NoteEditor({
           }}
           placeholder="e.g., Weekly Team Standup"
           disabled={isSaving}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500"
+          className="mt-1"
         />
       </div>
 
       <div>
-        <label
-          htmlFor="note-body"
-          className="block text-sm font-medium text-gray-700 mb-1"
-        >
-          Meeting Notes <span className="text-red-500">*</span>
-        </label>
-        <div className="relative">
-          <textarea
+        <Label htmlFor="note-body">
+          Meeting Notes <span className="text-destructive">*</span>
+        </Label>
+        <div className="relative mt-1">
+          <Textarea
             id="note-body"
             value={body}
             onChange={(e) => {
@@ -108,79 +107,38 @@ export function NoteEditor({
             placeholder="Paste your meeting notes here..."
             rows={12}
             disabled={isSaving || isGenerating}
-            className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-50 disabled:text-gray-500 resize-y ${
-              error ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={`resize-y ${error ? 'border-destructive' : ''}`}
           />
           {isGenerating && (
-            <div className="absolute inset-0 bg-white/70 flex items-center justify-center rounded-lg">
-              <div className="flex items-center gap-2 text-sm text-gray-600">
-                <svg
-                  className="animate-spin h-5 w-5 text-blue-600"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  />
-                </svg>
+            <div className="absolute inset-0 bg-background/70 flex items-center justify-center rounded-lg">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <Spinner size="sm" />
                 Generating sample notes...
               </div>
             </div>
           )}
         </div>
         {error && (
-          <p className="mt-1 text-sm text-red-600">{error}</p>
+          <p className="mt-1 text-sm text-destructive">{error}</p>
         )}
       </div>
 
-      <div className="flex items-center justify-end gap-3 pt-4 border-t border-gray-200">
-        <button
+      <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
+        <Button
           type="button"
+          variant="outline"
           onClick={onCancel}
           disabled={isSaving}
-          className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Cancel
-        </button>
-        <button
+        </Button>
+        <Button
           type="submit"
           disabled={isSaving || (mode === 'edit' && !isFormDirty)}
-          className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isSaving && (
-            <svg
-              className="animate-spin h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              />
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              />
-            </svg>
-          )}
+          {isSaving && <Spinner size="sm" className="text-current" />}
           {isSaving ? 'Saving...' : mode === 'create' ? 'Create Note' : 'Save Changes'}
-        </button>
+        </Button>
       </div>
     </form>
   );

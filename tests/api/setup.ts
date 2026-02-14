@@ -6,6 +6,7 @@
  * rely on existing data.
  */
 
+import { randomUUID } from 'node:crypto';
 import { createApp } from '../../apps/api/src/app.js';
 import { createSession } from '../../apps/api/src/services/session.js';
 import { prisma as prismaClient } from '../../apps/api/src/lib/prisma.js';
@@ -114,9 +115,9 @@ export async function createTestContext(
 ): Promise<TestContext> {
   const user = await prisma.user.create({
     data: {
-      email: userData.email || `test-${Date.now()}@example.com`,
+      email: userData.email || `test-${randomUUID()}@example.com`,
       name: userData.name || 'Test User',
-      googleId: userData.googleId || `google-${Date.now()}`,
+      googleId: userData.googleId || `google-${randomUUID()}`,
     },
   });
 

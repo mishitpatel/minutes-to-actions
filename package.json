@@ -5,7 +5,7 @@
   "description": "Paste meeting notes, extract action-items, manage them on a Kanban board",
   "packageManager": "pnpm@9.15.0",
   "scripts": {
-    "predev": "lsof -ti:3000 | xargs kill -9 2>/dev/null || true",
+    "predev": "lsof -ti:3000 | xargs kill -9 2>/dev/null || true && node -e \"try { require(require.resolve('@prisma/client', { paths: [process.cwd() + '/apps/api'] })) } catch { process.exit(1) }\" || pnpm db:generate",
     "dev": "pnpm run --parallel --filter './apps/*' dev",
     "build": "pnpm run --filter './packages/*' build && pnpm run --filter './apps/*' build",
     "test": "pnpm run --recursive test",

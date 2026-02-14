@@ -1,5 +1,18 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useActionItems } from '../hooks/useActionItems';
+import { Button } from './ui/button';
+import { Input } from './ui/input';
+import { Textarea } from './ui/textarea';
+import { Label } from './ui/label';
+import { Alert, AlertDescription } from './ui/alert';
+import { Spinner } from './ui/spinner';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from './ui/dialog';
 import type { Priority, Status } from '../services/action-items.service';
 
 interface ActionItemCreateModalProps {
@@ -25,7 +38,6 @@ export function ActionItemCreateModal({
   onClose,
   defaultStatus = 'todo',
 }: ActionItemCreateModalProps) {
-  const dialogRef = useRef<HTMLDivElement>(null);
   const { createItem, isCreating } = useActionItems();
 
   // Form state
@@ -45,29 +57,8 @@ export function ActionItemCreateModal({
       setStatus(defaultStatus);
       setDueDate('');
       setErrors({});
-      dialogRef.current?.focus();
     }
   }, [open, defaultStatus]);
-
-  // Handle escape key
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && open && !isCreating) {
-        onClose();
-      }
-    };
-
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
-  }, [open, isCreating, onClose]);
-
-  if (!open) return null;
-
-  const handleOverlayClick = () => {
-    if (!isCreating) {
-      onClose();
-    }
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,184 +100,119 @@ export function ActionItemCreateModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto">
-      <div className="flex min-h-full items-center justify-center p-4">
-        <div
-          className="fixed inset-0 bg-black/50 transition-opacity"
-          onClick={handleOverlayClick}
-          aria-hidden="true"
-        />
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && !isCreating && onClose()}>
+      <DialogContent className="sm:max-w-lg">
+        <form onSubmit={handleSubmit}>
+          <DialogHeader>
+            <DialogTitle>Create Action Item</DialogTitle>
+          </DialogHeader>
 
-        <div
-          ref={dialogRef}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="modal-title"
-          tabIndex={-1}
-          className="relative bg-white rounded-lg shadow-xl max-w-lg w-full focus:outline-none"
-        >
-          <form onSubmit={handleSubmit}>
-            {/* Header */}
-            <div className="flex items-start justify-between p-4 border-b border-gray-200">
-              <h2 id="modal-title" className="text-lg font-semibold text-gray-900">
-                Create Action Item
-              </h2>
-              <button
-                type="button"
-                onClick={onClose}
-                disabled={isCreating}
-                className="text-gray-400 hover:text-gray-600 p-1 rounded transition-colors disabled:opacity-50"
-                aria-label="Close"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
+          <div className="py-4 space-y-4">
+            {/* API Error */}
+            {errors.api && (
+              <Alert variant="destructive">
+                <AlertDescription>{errors.api}</AlertDescription>
+              </Alert>
+            )}
 
-            {/* Body */}
-            <div className="p-4 space-y-4">
-              {/* API Error */}
-              {errors.api && (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-                  {errors.api}
-                </div>
+            {/* Title */}
+            <div>
+              <Label htmlFor="title">
+                Title <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="title"
+                type="text"
+                value={title}
+                onChange={(e) => {
+                  setTitle(e.target.value);
+                  if (errors.title) setErrors((prev) => ({ ...prev, title: undefined }));
+                }}
+                className={`mt-1 ${errors.title ? 'border-destructive' : ''}`}
+                placeholder="Enter a title for this action item"
+                autoFocus
+              />
+              {errors.title && (
+                <p className="text-destructive text-sm mt-1">{errors.title}</p>
               )}
+            </div>
 
-              {/* Title */}
-              <div>
-                <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
-                  Title <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id="title"
-                  type="text"
-                  value={title}
-                  onChange={(e) => {
-                    setTitle(e.target.value);
-                    if (errors.title) setErrors((prev) => ({ ...prev, title: undefined }));
-                  }}
-                  className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                    errors.title ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder="Enter a title for this action item"
-                  autoFocus
-                />
-                {errors.title && (
-                  <p className="text-red-500 text-sm mt-1">{errors.title}</p>
-                )}
+            {/* Description */}
+            <div>
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                rows={3}
+                className="mt-1 resize-none"
+                placeholder="Add a description (optional)"
+              />
+            </div>
+
+            {/* Priority and Status */}
+            <div className="flex items-center gap-4">
+              <div className="flex-1">
+                <Label htmlFor="priority">Priority</Label>
+                <select
+                  id="priority"
+                  value={priority}
+                  onChange={(e) => setPriority(e.target.value as Priority)}
+                  className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                >
+                  {PRIORITY_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
               </div>
-
-              {/* Description */}
-              <div>
-                <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-                  Description
-                </label>
-                <textarea
-                  id="description"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  rows={3}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                  placeholder="Add a description (optional)"
-                />
-              </div>
-
-              {/* Priority and Status */}
-              <div className="flex items-center gap-4">
-                <div className="flex-1">
-                  <label htmlFor="priority" className="block text-sm font-medium text-gray-700 mb-1">
-                    Priority
-                  </label>
-                  <select
-                    id="priority"
-                    value={priority}
-                    onChange={(e) => setPriority(e.target.value as Priority)}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    {PRIORITY_OPTIONS.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="flex-1">
-                  <label htmlFor="status" className="block text-sm font-medium text-gray-700 mb-1">
-                    Status
-                  </label>
-                  <select
-                    id="status"
-                    value={status}
-                    onChange={(e) => setStatus(e.target.value as Status)}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    {STATUS_OPTIONS.map((opt) => (
-                      <option key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* Due Date */}
-              <div>
-                <label htmlFor="due-date" className="block text-sm font-medium text-gray-700 mb-1">
-                  Due Date
-                </label>
-                <input
-                  id="due-date"
-                  type="date"
-                  value={dueDate}
-                  onChange={(e) => setDueDate(e.target.value)}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+              <div className="flex-1">
+                <Label htmlFor="status">Status</Label>
+                <select
+                  id="status"
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value as Status)}
+                  className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                >
+                  {STATUS_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
-            {/* Footer */}
-            <div className="flex items-center justify-end gap-3 p-4 border-t border-gray-200 bg-gray-50 rounded-b-lg">
-              <button
-                type="button"
-                onClick={onClose}
-                disabled={isCreating}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={isCreating}
-                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isCreating && (
-                  <svg
-                    className="animate-spin h-4 w-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    />
-                  </svg>
-                )}
-                {isCreating ? 'Creating...' : 'Create'}
-              </button>
+            {/* Due Date */}
+            <div>
+              <Label htmlFor="due-date">Due Date</Label>
+              <Input
+                id="due-date"
+                type="date"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+                className="mt-1"
+              />
             </div>
-          </form>
-        </div>
-      </div>
-    </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={isCreating}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isCreating}>
+              {isCreating && <Spinner size="sm" className="text-current" />}
+              {isCreating ? 'Creating...' : 'Create'}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 }

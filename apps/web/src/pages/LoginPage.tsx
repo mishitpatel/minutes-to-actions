@@ -1,6 +1,10 @@
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { Card, CardContent, CardHeader } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Alert, AlertDescription } from '../components/ui/alert';
+import { Spinner } from '../components/ui/spinner';
 
 const GoogleIcon = () => (
   <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
@@ -56,42 +60,45 @@ export function LoginPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Spinner />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-      <div className="bg-white p-8 rounded-lg shadow-md max-w-md w-full">
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <Card className="max-w-md w-full">
+        <CardHeader className="text-center">
+          <h1 className="text-2xl font-bold text-foreground mb-2">
             Minutes to Actions
           </h1>
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             Paste meeting notes, extract action items, and manage them on a Kanban board.
           </p>
-        </div>
+        </CardHeader>
 
-        {errorMessage && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
-            <p className="text-sm text-red-600">{errorMessage}</p>
-          </div>
-        )}
+        <CardContent>
+          {errorMessage && (
+            <Alert variant="destructive" className="mb-6">
+              <AlertDescription>{errorMessage}</AlertDescription>
+            </Alert>
+          )}
 
-        <button
-          onClick={login}
-          className="w-full flex items-center justify-center bg-white border border-gray-300 text-gray-700 py-3 px-4 rounded-md hover:bg-gray-50 transition-colors shadow-sm"
-        >
-          <GoogleIcon />
-          Sign in with Google
-        </button>
+          <Button
+            variant="outline"
+            className="w-full bg-white dark:bg-white text-foreground dark:text-gray-700 py-6"
+            onClick={login}
+          >
+            <GoogleIcon />
+            Sign in with Google
+          </Button>
 
-        <p className="mt-6 text-center text-xs text-gray-500">
-          By signing in, you agree to our Terms of Service and Privacy Policy.
-        </p>
-      </div>
+          <p className="mt-6 text-center text-xs text-muted-foreground">
+            By signing in, you agree to our Terms of Service and Privacy Policy.
+          </p>
+        </CardContent>
+      </Card>
     </div>
   );
 }

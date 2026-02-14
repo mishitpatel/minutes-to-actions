@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import {
   meetingNotesService,
   type CreateNoteData,
@@ -27,6 +28,10 @@ export function useMeetingNotes(page = 1, limit = 10) {
     mutationFn: (noteData: CreateNoteData) => meetingNotesService.create(noteData),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: MEETING_NOTES_QUERY_KEY });
+      toast.success('Note created');
+    },
+    onError: () => {
+      toast.error('Failed to create note');
     },
   });
 
@@ -35,6 +40,10 @@ export function useMeetingNotes(page = 1, limit = 10) {
       meetingNotesService.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: MEETING_NOTES_QUERY_KEY });
+      toast.success('Note updated');
+    },
+    onError: () => {
+      toast.error('Failed to update note');
     },
   });
 
@@ -42,6 +51,10 @@ export function useMeetingNotes(page = 1, limit = 10) {
     mutationFn: (id: string) => meetingNotesService.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: MEETING_NOTES_QUERY_KEY });
+      toast.success('Note deleted');
+    },
+    onError: () => {
+      toast.error('Failed to delete note');
     },
   });
 

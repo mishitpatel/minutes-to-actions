@@ -1,0 +1,68 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(pnpm add:*)",
+      "Bash(npx tsc:*)",
+      "Bash(pnpm test:e2e:*)",
+      "Bash(grep:*)",
+      "WebSearch",
+      "Bash(git -C /Users/mishit/Documents/code/minutes-to-actions status -u)",
+      "Bash(git -C /Users/mishit/Documents/code/minutes-to-actions diff --cached --stat)",
+      "Bash(gh milestone:*)",
+      "Bash(gh issue list:*)",
+      "Bash(gh api:*)",
+      "Bash(npx shadcn@latest add:*)",
+      "Bash(pnpm --filter web typecheck:*)",
+      "Bash(pnpm --filter web build:*)",
+      "Bash(pnpm --filter web lint:*)",
+      "Bash(pnpm install:*)",
+      "Bash(cat:*)",
+      "Bash(ls:*)",
+      "Bash(node -e:*)",
+      "Bash(lsof:*)",
+      "Bash(xargs kill:*)",
+      "Bash(python3:*)",
+      "WebFetch(domain:www.anthropic.com)",
+      "WebFetch(domain:claude.com)",
+      "WebFetch(domain:www.humanlayer.dev)",
+      "Bash(git checkout:*)"
+    ]
+  },
+  "outputStyle": "Explanatory",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pnpm --filter web typecheck 2>&1 | tail -5"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .claude/hooks/security-check.py"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Remember: /verify-changes before shipping'"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -18,6 +18,7 @@ serialization.
 | `tests/api/*.test.ts` | Vitest | `pnpm test:api:report` (with JSON/JUnit output) |
 | `tests/api/*.test.ts` | Vitest UI | `pnpm test:api:ui` (interactive browser) |
 | `tests/api/*.test.ts` | Vitest | `pnpm test:api:coverage` (with coverage report) |
+| `tests/api/*.test.ts` | Vitest | `pnpm test:api:html` (interactive HTML with HTTP details) |
 
 ---
 

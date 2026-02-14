@@ -40,6 +40,7 @@ pnpm test:api         # Run API E2E tests
 pnpm test:api:report  # Generate JSON + JUnit test reports
 pnpm test:api:ui      # Open interactive Vitest UI
 pnpm test:api:coverage  # Generate test coverage report
+pnpm test:api:html    # Generate interactive HTML report with HTTP details
 pnpm test:e2e         # Run Browser E2E tests
 pnpm build            # Build for production
 pnpm lint             # Check code quality
@@ -204,14 +205,15 @@ After completing API endpoints or user-facing features, **suggest** generating t
 
 ### Test Locations
 
-| Test Type | Location | Command |
-|-----------|----------|---------|
-| Unit Tests | `apps/*/src/**/*.test.ts` (co-located) | `pnpm test` |
-| API E2E | `tests/api/*.test.ts` | `pnpm test:api` |
-| API E2E (report) | `api-test-results/` | `pnpm test:api:report` |
-| API E2E (interactive) | Browser UI | `pnpm test:api:ui` |
-| API E2E (coverage) | `coverage/` | `pnpm test:api:coverage` |
-| Browser E2E | `tests/e2e/*.spec.ts` | `pnpm test:e2e` |
+| Test Type             | Location                               | Command                  |
+| --------------------- | -------------------------------------- | ------------------------ |
+| Unit Tests            | `apps/*/src/**/*.test.ts` (co-located) | `pnpm test`              |
+| API E2E               | `tests/api/*.test.ts`                  | `pnpm test:api`          |
+| API E2E (report)      | `api-test-results/`                    | `pnpm test:api:report`   |
+| API E2E (interactive) | Browser UI                             | `pnpm test:api:ui`       |
+| API E2E (coverage)    | `coverage/`                            | `pnpm test:api:coverage` |
+| API E2E (HTML report) | `api-test-report/`                     | `pnpm test:api:html`     |
+| Browser E2E           | `tests/e2e/*.spec.ts`                  | `pnpm test:e2e`          |
 
 ### Patterns Reference
 

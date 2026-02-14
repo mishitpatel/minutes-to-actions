@@ -665,6 +665,7 @@ pnpm test:api:watch           # Watch mode
 pnpm test:api:report          # Console + JSON/JUnit reports in api-test-results/
 pnpm test:api:ui              # Interactive Vitest UI in browser
 pnpm test:api:coverage        # Coverage report (text + HTML in coverage/)
+pnpm test:api:html            # Interactive HTML report with HTTP request/response details
 
 # Browser E2E tests (tests/e2e/)
 pnpm test:e2e                 # Chromium only (default, fast)

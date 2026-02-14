@@ -69,11 +69,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - HTTP interaction metadata tracking in test setup for HTML reporter
 - `test:api:html` script for interactive HTML test reports
 - Custom HTML test reporter (`tests/reporters/http-html-reporter.ts`)
+- shadcn/ui design system — 19 Radix UI-based components (Button, Card, Dialog, DropdownMenu, Badge, Alert, Skeleton, Sheet, Tooltip, etc.)
+- Dark mode via `next-themes` with ThemeToggle component (light/dark/system)
+- CSS variable-based theming with semantic design tokens (`--success`, `--warning`, `--info`)
+- `components.json` shadcn/ui configuration
+- Zod form validation schemas in `lib/schemas.ts`
+- Workflow optimization planning docs
 
 ### Changed
 - Reformatted CLAUDE.md "First Time Setup" section for consistency
 - Added deprecation note to `packages/shared` - API module Zod schemas are source of truth
 - NoteEditor now accepts `externalData`, `onChange`, and `isGenerating` props for AI generation integration
+- Reworked all 6 pages (Login, Dashboard, MeetingNotes, NewNote, NoteDetail, Board) to use shadcn/ui components
+- Reworked all modals and panels (ActionItemCreateModal, ActionItemDetailModal, ConfirmDialog, ExtractionReviewPanel) to use Dialog/AlertDialog
+- Updated Sidebar and AppLayout with Sheet-based mobile menu and ThemeToggle
+- Updated Tailwind config with CSS variable design token mappings and dark mode class strategy
 
 ### Fixed
 - Fixed `due_date` format in ExtractionReviewPanel — appends `T00:00:00.000Z` to date-only strings for valid ISO timestamps

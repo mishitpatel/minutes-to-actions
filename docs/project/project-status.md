@@ -1,14 +1,14 @@
 # Project Status
 
-> Last Updated: 2026-02-07
+> Last Updated: 2026-02-14
 > Updated By: Claude Code
 
 ## Current Position
 
 **Phase:** 1 (MVP)
-**Milestone:** M7 - AI Sample Generation
-**Task:** Task 7.2 - Generate Sample Button UI
-**Status:** Milestone 7 Complete
+**Milestone:** M6 - Navigation, UX & Polish
+**Task:** shadcn/ui design system migration
+**Status:** PR #48 open (depends on PR #47)
 
 → See `project-plan.md` for full task details and subtasks
 
@@ -33,6 +33,16 @@
 | 2026-01-20 | devops/ folder | Separate operational from state docs |
 
 ### Session Log
+**2026-02-14 - shadcn/ui Design System Migration (M6 Polish)**
+- Migrated entire frontend to shadcn/ui design system with 19 Radix UI-based components
+- Added dark mode support via `next-themes` with ThemeToggle (light/dark/system)
+- Implemented CSS variable-based theming with semantic tokens (success, warning, info)
+- Reworked all 6 pages and all modals/panels to use new design system
+- Updated Tailwind config with design token mappings and dark mode class strategy
+- Added Zod form validation schemas in `lib/schemas.ts`
+- Created branch `feature/shadcn-ui-migration`, PR #48 targeting main
+- **Next: Merge PR #47 first, then merge #48. Continue M5 or M6.**
+
 **2026-02-07 - Milestone 7 Complete (AI Sample Generation)**
 - Implemented `generateSampleMeetingNotes()` in claude.ts with meeting-type-specific prompts (weekly-standup, one-on-one, sprint-retro)
 - Added `POST /meeting-notes/generate-sample` endpoint with Zod schemas and auth

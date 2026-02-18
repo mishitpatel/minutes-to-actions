@@ -1,16 +1,16 @@
 # Project Status
 
-> Last Updated: 2026-02-14
+> Last Updated: 2026-02-18
 > Updated By: Claude Code
 
 ## Current Position
 
 **Phase:** 1 (MVP)
-**Milestone:** M6 - Navigation, UX & Polish
-**Task:** shadcn/ui design system migration
-**Status:** PR #48 open (depends on PR #47)
+**Milestone:** M5 - Board Sharing
+**Task:** Ready to start Task 5.1
+**Status:** On `main` branch (`e1e3688`), all PRs merged, clean working tree
 
-→ See `project-plan.md` for full task details and subtasks
+→ See `project-plan.md` → Milestone 5 → Task 5.1 for next task details
 
 ## Blockers
 
@@ -21,18 +21,27 @@
 ## Session Context
 
 ### Current Task Reference
-- **Location:** `project-plan.md` → Milestone 7 → Task 7.2
-- **Files to modify:** Complete - all M7 files implemented
-- **Reference docs:** `docs/product/user-stories-phase1.md` (US-3.4)
+- **Location:** `project-plan.md` → Milestone 5 → Task 5.1
+- **Open Issues:** #28–#33 (M5: Board Sharing), #35–#40 (M6: Polish)
+- **Reference docs:** `docs/product/user-stories-phase1.md` (US-5.1 through US-5.6)
 
 ### Recent Decisions
 | Date | Decision | Rationale |
 |------|----------|-----------|
+| 2026-02-14 | shadcn/ui for design system | Consistent Radix-based components, dark mode, CSS variable theming |
 | 2026-01-20 | Prisma for ORM | Type safety, migrations |
 | 2026-01-20 | Google OAuth only | Simpler MVP, no password management |
 | 2026-01-20 | devops/ folder | Separate operational from state docs |
 
 ### Session Log
+**2026-02-18 - Post-Merge Status Update**
+- All PRs merged: #48 (shadcn/ui migration), #47 (M7 AI sample), and prior PRs
+- Closed issues: #43 (meeting notes extraction bug), #41 (test issue)
+- Milestones complete: M1 (Auth), M2 (Meeting Notes), M3 (Action Board), M4 (AI Extraction), M7 (AI Sample Generation)
+- Also complete: M6 Task 6.1 (Sidebar Navigation), shadcn/ui design system migration
+- Dropped stale stash from `feature/shadcn-ui-migration` branch
+- **Next: Start M5 (Board Sharing) — Task 5.1. Remaining: M5 (#28–#33) and M6 (#35–#40).**
+
 **2026-02-14 - shadcn/ui Design System Migration (M6 Polish)**
 - Migrated entire frontend to shadcn/ui design system with 19 Radix UI-based components
 - Added dark mode support via `next-themes` with ThemeToggle (light/dark/system)
@@ -41,7 +50,7 @@
 - Updated Tailwind config with design token mappings and dark mode class strategy
 - Added Zod form validation schemas in `lib/schemas.ts`
 - Created branch `feature/shadcn-ui-migration`, PR #48 targeting main
-- **Next: Merge PR #47 first, then merge #48. Continue M5 or M6.**
+- **Merged: PR #47 first, then PR #48.**
 
 **2026-02-07 - Milestone 7 Complete (AI Sample Generation)**
 - Implemented `generateSampleMeetingNotes()` in claude.ts with meeting-type-specific prompts (weekly-standup, one-on-one, sprint-retro)
